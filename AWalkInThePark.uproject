@@ -7,7 +7,10 @@
 		{
 			"Name": "AWalkInThePark",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine"
+			]
 		}
 	],
 	"Plugins": [
@@ -17,14 +20,6 @@
 		},
 		{
 			"Name": "AlembicImporter",
-			"Enabled": false
-		},
-		{
-			"Name": "ActorSequence",
-			"Enabled": false
-		},
-		{
-			"Name": "ActorLayerUtilities",
 			"Enabled": false
 		},
 		{
@@ -59,14 +54,6 @@
 			"Enabled": false
 		},
 		{
-			"Name": "AnimationData",
-			"Enabled": false
-		},
-		{
-			"Name": "AnimationSharing",
-			"Enabled": false
-		},
-		{
 			"Name": "AppleImageUtils",
 			"Enabled": false
 		},
@@ -79,27 +66,7 @@
 			"Enabled": false
 		},
 		{
-			"Name": "AnimationModifierLibrary",
-			"Enabled": false
-		},
-		{
-			"Name": "AssetTags",
-			"Enabled": false
-		},
-		{
-			"Name": "ChaosCloth",
-			"Enabled": false
-		},
-		{
-			"Name": "ChaosClothEditor",
-			"Enabled": false
-		},
-		{
 			"Name": "AudioCapture",
-			"Enabled": false
-		},
-		{
-			"Name": "AutomationUtils",
 			"Enabled": false
 		},
 		{
@@ -112,34 +79,6 @@
 		},
 		{
 			"Name": "BlendSpaceMotionAnalysis",
-			"Enabled": false
-		},
-		{
-			"Name": "BlueprintHeaderView",
-			"Enabled": false
-		},
-		{
-			"Name": "CableComponent",
-			"Enabled": false
-		},
-		{
-			"Name": "CameraShakePreviewer",
-			"Enabled": false
-		},
-		{
-			"Name": "ChangelistReview",
-			"Enabled": false
-		},
-		{
-			"Name": "ChaosNiagara",
-			"Enabled": false
-		},
-		{
-			"Name": "ChaosEditor",
-			"Enabled": false
-		},
-		{
-			"Name": "ChaosSolverPlugin",
 			"Enabled": false
 		},
 		{
@@ -171,22 +110,6 @@
 			"Enabled": false
 		},
 		{
-			"Name": "ControlRig",
-			"Enabled": false
-		},
-		{
-			"Name": "CryptoKeys",
-			"Enabled": false
-		},
-		{
-			"Name": "CustomMeshComponent",
-			"Enabled": false
-		},
-		{
-			"Name": "DataValidation",
-			"Enabled": false
-		},
-		{
 			"Name": "DatasmithContent",
 			"Enabled": false
 		},
@@ -196,14 +119,6 @@
 		},
 		{
 			"Name": "Dataflow",
-			"Enabled": false
-		},
-		{
-			"Name": "EditorDebugTools",
-			"Enabled": false
-		},
-		{
-			"Name": "EngineAssetDefinitions",
 			"Enabled": false
 		},
 		{
@@ -490,6 +405,90 @@
 		{
 			"Name": "AudioModulation",
 			"Enabled": true
+		},
+		{
+			"Name": "VisualStudioCodeSourceCodeAccess",
+			"Enabled": false
+		},
+		{
+			"Name": "ActorSequence",
+			"Enabled": false
+		},
+		{
+			"Name": "ActorLayerUtilities",
+			"Enabled": false
+		},
+		{
+			"Name": "AnimationData",
+			"Enabled": false
+		},
+		{
+			"Name": "AnimationModifierLibrary",
+			"Enabled": false
+		},
+		{
+			"Name": "AnimationSharing",
+			"Enabled": false
+		},
+		{
+			"Name": "ChaosCloth",
+			"Enabled": false
+		},
+		{
+			"Name": "ChaosClothEditor",
+			"Enabled": false
+		},
+		{
+			"Name": "AssetTags",
+			"Enabled": false
+		},
+		{
+			"Name": "BlueprintHeaderView",
+			"Enabled": false
+		},
+		{
+			"Name": "CableComponent",
+			"Enabled": false
+		},
+		{
+			"Name": "CameraShakePreviewer",
+			"Enabled": false
+		},
+		{
+			"Name": "ChaosNiagara",
+			"Enabled": false
+		},
+		{
+			"Name": "ChaosEditor",
+			"Enabled": false
+		},
+		{
+			"Name": "ChaosSolverPlugin",
+			"Enabled": false
+		},
+		{
+			"Name": "ControlRig",
+			"Enabled": false
+		},
+		{
+			"Name": "CryptoKeys",
+			"Enabled": false
+		},
+		{
+			"Name": "CustomMeshComponent",
+			"Enabled": false
+		},
+		{
+			"Name": "DataValidation",
+			"Enabled": false
+		},
+		{
+			"Name": "EditorDebugTools",
+			"Enabled": false
+		},
+		{
+			"Name": "AutomationUtils",
+			"Enabled": false
 		}
 	],
 	"TargetPlatforms": [
