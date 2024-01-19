@@ -2,6 +2,10 @@
 
 
 #include "WalkPawn.h"
+#include "EnhancedInputSubsystems.h"
+#include "EnhancedInputComponent.h"
+#include "InputActionValue.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AWalkPawn::AWalkPawn()
@@ -30,5 +34,55 @@ void AWalkPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
+
+	Subsystem->ClearAllMappings();
+	Subsystem->AddMappingContext(MappingContext, 0);
+
+	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	Input->BindAction(ChangeSpeedAction, ETriggerEvent::Triggered, this, &AWalkPawn::ChangeSpeed);
+	Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &AWalkPawn::Look);
+	Input->BindAction(ToggleMusicAction, ETriggerEvent::Triggered, this, &AWalkPawn::ToggleMusic);
+	Input->BindAction(ChangeSongAction, ETriggerEvent::Triggered, this, &AWalkPawn::ChangeSong);
+	Input->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AWalkPawn::Interact);
+	Input->BindAction(TogglePauseAction, ETriggerEvent::Triggered, this, &AWalkPawn::TogglePause);
+
+}
+
+void AWalkPawn::ChangeSpeed(const FInputActionValue& Value)
+{
+	float ActionValue = Value.Get<float>();
+	UE_LOG(LogTemp, Warning, TEXT("WalkPawn: change speed with action value: %f"), ActionValue)
+}
+
+void AWalkPawn::Look(const FInputActionValue& Value)
+{
+	FVector2D ActionValue = Value.Get<FVector2D>();
+	UE_LOG(LogTemp, Warning, TEXT("WalkPawn: look with action value: %s"), *ActionValue.ToString())
+}
+
+void AWalkPawn::ToggleMusic(const FInputActionValue& Value)
+{
+	bool ActionValue = Value.Get<bool>();
+	UE_LOG(LogTemp, Warning, TEXT("WalkPawn: toggle music with action value: %s"), (ActionValue ? TEXT("True") : TEXT("False")))
+}
+
+void AWalkPawn::ChangeSong(const FInputActionValue& Value)
+{
+	bool ActionValue = Value.Get<bool>();
+	UE_LOG(LogTemp, Warning, TEXT("WalkPawn: change song with action value: %s"), (ActionValue ? TEXT("True") : TEXT("False")))
+}
+
+void AWalkPawn::Interact(const FInputActionValue& Value)
+{
+	bool ActionValue = Value.Get<bool>();
+	UE_LOG(LogTemp, Warning, TEXT("WalkPawn: interact with action value: %s"), (ActionValue ? TEXT("True") : TEXT("False")))
+}
+
+void AWalkPawn::TogglePause(const FInputActionValue& Value)
+{
+	bool ActionValue = Value.Get<bool>();
+	UGameplayStatics::SetGamePaused(GetWorld(), !UGameplayStatics::IsGamePaused(GetWorld()));
 }
 
