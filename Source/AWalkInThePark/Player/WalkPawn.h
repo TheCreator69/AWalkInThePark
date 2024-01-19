@@ -8,6 +8,7 @@
 
 class UInputMappingContext;
 class UInputAction;
+class AWalkPath;
 
 // Default pawn implementing spline-based movement and other essential player functionality
 UCLASS()
@@ -46,6 +47,9 @@ public:
 	// Input action used for pausing/unpausing
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputAction> TogglePauseAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
+	TObjectPtr<AWalkPath> CurrentPath;
 
 protected:
 	// Called when the game starts or when spawned
