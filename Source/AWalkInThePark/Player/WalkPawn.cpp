@@ -6,6 +6,8 @@
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
 #include "Kismet/GameplayStatics.h"
+#include "SplineMovementComponent.h"
+#include "Camera/CameraComponent.h"
 
 // Sets default values
 AWalkPawn::AWalkPawn()
@@ -13,6 +15,13 @@ AWalkPawn::AWalkPawn()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("DefaultSceneRoot"));
+	SetRootComponent(DefaultSceneRoot);
+
+	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
+	CameraComponent->SetupAttachment(DefaultSceneRoot);
+
+	SplineMovementComponent = CreateDefaultSubobject<USplineMovementComponent>(TEXT("SplineMovementComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -53,13 +62,14 @@ void AWalkPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 void AWalkPawn::ChangeSpeed(const FInputActionValue& Value)
 {
 	float ActionValue = Value.Get<float>();
-	UE_LOG(LogTemp, Warning, TEXT("WalkPawn: change speed with action value: %f"), ActionValue)
+	bool bSlowDown = ActionValue < 0.f;
+	SplineMovementComponent->AddToMovementSpeed((bSlowDown ? 1.0 : 0.25) * ActionValue);
 }
 
 void AWalkPawn::Look(const FInputActionValue& Value)
 {
 	FVector2D ActionValue = Value.Get<FVector2D>();
-	UE_LOG(LogTemp, Warning, TEXT("WalkPawn: look with action value: %s"), *ActionValue.ToString())
+	SplineMovementComponent->AddCameraRotationOffset(FRotator(ActionValue.Y, ActionValue.X, 0.f));
 }
 
 void AWalkPawn::ToggleMusic(const FInputActionValue& Value)

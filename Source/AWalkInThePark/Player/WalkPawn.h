@@ -9,6 +9,8 @@
 class UInputMappingContext;
 class UInputAction;
 class AWalkPath;
+class USplineMovementComponent;
+class UCameraComponent;
 
 // Default pawn implementing spline-based movement and other essential player functionality
 UCLASS()
@@ -19,6 +21,15 @@ class AWALKINTHEPARK_API AWalkPawn : public APawn
 public:
 	// Sets default values for this pawn's properties
 	AWalkPawn();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<USceneComponent> DefaultSceneRoot;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UCameraComponent> CameraComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<USplineMovementComponent> SplineMovementComponent;
 
 	// The mapping context used to define input actions
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
@@ -47,9 +58,6 @@ public:
 	// Input action used for pausing/unpausing
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputAction> TogglePauseAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
-	TObjectPtr<AWalkPath> CurrentPath;
 
 protected:
 	// Called when the game starts or when spawned
