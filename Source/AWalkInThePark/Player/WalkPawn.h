@@ -11,6 +11,7 @@ class UInputAction;
 class AWalkPath;
 class USplineMovementComponent;
 class UCameraComponent;
+class UInteractionComponent;
 
 // Default pawn implementing spline-based movement and other essential player functionality
 UCLASS()
@@ -37,6 +38,10 @@ public:
 	// Component used to play music
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UAudioComponent> MusicPlayerComponent;
+
+	// Component used to interact with interactive actors (what a mouthful!)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UInteractionComponent> InteractionComponent;
 	
 	// Music track used to mask the water monster's sounds
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")

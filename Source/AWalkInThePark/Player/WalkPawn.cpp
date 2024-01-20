@@ -9,6 +9,8 @@
 #include "SplineMovementComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/AudioComponent.h"
+#include "../Interaction/InteractionComponent.h"
+#include "../Interaction/InteractiveActor.h"
 
 // Sets default values
 AWalkPawn::AWalkPawn()
@@ -26,6 +28,7 @@ AWalkPawn::AWalkPawn()
 	MusicPlayerComponent->SetupAttachment(DefaultSceneRoot);
 
 	SplineMovementComponent = CreateDefaultSubobject<USplineMovementComponent>(TEXT("SplineMovementComponent"));
+	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("InteractionComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -90,6 +93,10 @@ void AWalkPawn::ChangeSong(const FInputActionValue& Value)
 
 void AWalkPawn::Interact(const FInputActionValue& Value)
 {
+	AActor* InteractionActor = InteractionComponent->TargetedActor;
+	if (!InteractionActor) return;
+
+	IInteractiveActor::Execute_Interact(InteractionActor, this);
 }
 
 void AWalkPawn::TogglePause(const FInputActionValue& Value)
