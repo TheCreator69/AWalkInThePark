@@ -5,6 +5,7 @@
 #include "WalkPawn.h"
 #include "WalkPath.h"
 #include "Components/SplineComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
 USplineMovementComponent::USplineMovementComponent()
@@ -55,9 +56,10 @@ void USplineMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 	SetOwnerTransformAlongSpline();
 }
 
-void USplineMovementComponent::AddToMovementSpeed(float SpeedOffset)
+void USplineMovementComponent::AddToMovementSpeed(float SpeedOffsetPerSecond)
 {
-	CurrentSpeed = FMath::Clamp(CurrentSpeed + SpeedOffset, 0.f, MaxSpeed);
+	SpeedOffsetPerSecond *= UGameplayStatics::GetWorldDeltaSeconds(GetWorld());
+	CurrentSpeed = FMath::Clamp(CurrentSpeed + SpeedOffsetPerSecond, 0.f, MaxSpeed);
 }
 
 void USplineMovementComponent::AddCameraRotationOffset(FRotator Offset)

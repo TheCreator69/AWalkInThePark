@@ -60,14 +60,13 @@ void AWalkPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Input->BindAction(ChangeSongAction, ETriggerEvent::Triggered, this, &AWalkPawn::ChangeSong);
 	Input->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AWalkPawn::Interact);
 	Input->BindAction(TogglePauseAction, ETriggerEvent::Triggered, this, &AWalkPawn::TogglePause);
-
 }
 
 void AWalkPawn::ChangeSpeed(const FInputActionValue& Value)
 {
 	float ActionValue = Value.Get<float>();
 	bool bSlowDown = ActionValue < 0.f;
-	SplineMovementComponent->AddToMovementSpeed((bSlowDown ? 1.0 : 0.25) * ActionValue);
+	SplineMovementComponent->AddToMovementSpeed((bSlowDown ? 120.f : 30.f) * ActionValue);
 }
 
 void AWalkPawn::Look(const FInputActionValue& Value)
