@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "SplineMovementComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/AudioComponent.h"
 
 // Sets default values
 AWalkPawn::AWalkPawn()
@@ -21,6 +22,9 @@ AWalkPawn::AWalkPawn()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComponent->SetupAttachment(DefaultSceneRoot);
 
+	MusicPlayerComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("MusicPlayer"));
+	MusicPlayerComponent->SetupAttachment(DefaultSceneRoot);
+
 	SplineMovementComponent = CreateDefaultSubobject<USplineMovementComponent>(TEXT("SplineMovementComponent"));
 }
 
@@ -28,14 +32,14 @@ AWalkPawn::AWalkPawn()
 void AWalkPawn::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	MusicPlayerComponent->SetPaused(true);
 }
 
 // Called every frame
 void AWalkPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 // Called to bind functionality to input
@@ -74,25 +78,23 @@ void AWalkPawn::Look(const FInputActionValue& Value)
 
 void AWalkPawn::ToggleMusic(const FInputActionValue& Value)
 {
-	bool ActionValue = Value.Get<bool>();
-	UE_LOG(LogTemp, Warning, TEXT("WalkPawn: toggle music with action value: %s"), (ActionValue ? TEXT("True") : TEXT("False")))
+	MusicPlayerComponent->SetPaused(!MusicPlayerComponent->bIsPaused);
 }
 
 void AWalkPawn::ChangeSong(const FInputActionValue& Value)
 {
-	bool ActionValue = Value.Get<bool>();
-	UE_LOG(LogTemp, Warning, TEXT("WalkPawn: change song with action value: %s"), (ActionValue ? TEXT("True") : TEXT("False")))
+	if (MusicPlayerComponent->bIsPaused) return;
+
+	MusicPlayerComponent->SetSound(bIsPlayingWaterMask ? MusicTrackParkMask : MusicTrackWaterMask);
+	bIsPlayingWaterMask = !bIsPlayingWaterMask;
 }
 
 void AWalkPawn::Interact(const FInputActionValue& Value)
 {
-	bool ActionValue = Value.Get<bool>();
-	UE_LOG(LogTemp, Warning, TEXT("WalkPawn: interact with action value: %s"), (ActionValue ? TEXT("True") : TEXT("False")))
 }
 
 void AWalkPawn::TogglePause(const FInputActionValue& Value)
 {
-	bool ActionValue = Value.Get<bool>();
 	UGameplayStatics::SetGamePaused(GetWorld(), !UGameplayStatics::IsGamePaused(GetWorld()));
 }
 

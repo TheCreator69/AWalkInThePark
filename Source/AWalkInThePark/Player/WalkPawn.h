@@ -22,14 +22,29 @@ public:
 	// Sets default values for this pawn's properties
 	AWalkPawn();
 
+	// Root component
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<USceneComponent> DefaultSceneRoot;
 
+	// Camera used as view target
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UCameraComponent> CameraComponent;
 
+	// Component responsible for moving player along a spline
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<USplineMovementComponent> SplineMovementComponent;
+
+	// Component used to play music
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UAudioComponent> MusicPlayerComponent;
+	
+	// Music track used to mask the water monster's sounds
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
+	TObjectPtr<USoundBase> MusicTrackWaterMask;
+
+	// Music track used to mask the park monster's sounds
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
+	TObjectPtr<USoundBase> MusicTrackParkMask;
 
 	// The mapping context used to define input actions
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
@@ -58,6 +73,10 @@ public:
 	// Input action used for pausing/unpausing
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputAction> TogglePauseAction;
+
+private:
+	// Is the current music being played the track that masks the water monster?
+	bool bIsPlayingWaterMask = true;
 
 protected:
 	// Called when the game starts or when spawned

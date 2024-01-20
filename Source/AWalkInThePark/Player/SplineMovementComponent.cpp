@@ -25,6 +25,8 @@ void USplineMovementComponent::SetOwnerTransformAlongSpline() const
 	AActor* Owner = GetOwner();
 	FTransform SplineTransform = CurrentPath->Spline->GetTransformAtDistanceAlongSpline(DistanceAlongSpline, ESplineCoordinateSpace::World);
 	Owner->SetActorLocation(SplineTransform.GetLocation());
+
+	// If owner is a pawn, use control rotation to prevent camera rotating weirdly if the component has a relative offset on any axis
 	APawn* PawnOwner = Cast<APawn>(Owner);
 	if (PawnOwner)
 	{
@@ -63,7 +65,5 @@ void USplineMovementComponent::AddCameraRotationOffset(FRotator Offset)
 	CameraRotationOffset += Offset;
 	CameraRotationOffset.Pitch = FMath::Clamp(CameraRotationOffset.Pitch, -MaxPitchOffset, MaxPitchOffset);
 	CameraRotationOffset.Yaw = FMath::Clamp(CameraRotationOffset.Yaw, -MaxYawOffset, MaxYawOffset);
-
-	UE_LOG(LogTemp, Warning, TEXT("Camera Rotation Offset: %s"), *CameraRotationOffset.ToCompactString())
 }
 
