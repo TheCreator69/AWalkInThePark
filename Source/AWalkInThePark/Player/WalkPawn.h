@@ -12,6 +12,9 @@ class AWalkPath;
 class USplineMovementComponent;
 class UCameraComponent;
 class UInteractionComponent;
+class USanityComponent;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMusicPlayStateChanged, bool, bIsPaused);
 
 // Default pawn implementing spline-based movement and other essential player functionality
 UCLASS()
@@ -39,9 +42,17 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UAudioComponent> MusicPlayerComponent;
 
+	// Component used to play low sanity ambience
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UAudioComponent> LowSanityAmbienceComponent;
+
 	// Component used to interact with interactive actors (what a mouthful!)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UInteractionComponent> InteractionComponent;
+
+	// Component used to manage sanity and sanity-related effects
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<USanityComponent> SanityComponent;
 	
 	// Music track used to mask the water monster's sounds
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
@@ -50,6 +61,10 @@ public:
 	// Music track used to mask the park monster's sounds
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
 	TObjectPtr<USoundBase> MusicTrackParkMask;
+
+	// Sound effect used to play a random intrusive thought
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Intrusive Thoughts")
+	TObjectPtr<USoundBase> IntrusiveThoughtSoundEffect;
 
 	// The mapping context used to define input actions
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
@@ -78,6 +93,10 @@ public:
 	// Input action used for pausing/unpausing
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputAction> TogglePauseAction;
+
+	// Event dispatched when the music starts/stops playing
+	UPROPERTY(BlueprintAssignable, Category = "Music")
+	FMusicPlayStateChanged OnMusicStateChanged;
 
 private:
 	// Is the current music being played the track that masks the water monster?
@@ -118,5 +137,8 @@ private:
 	// Pause/Unpause the game
 	UFUNCTION()
 	void TogglePause(const FInputActionValue& Value);
+
+	UFUNCTION()
+	void KillPlayer();
 
 };

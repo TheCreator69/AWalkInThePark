@@ -11,6 +11,7 @@
 #include "Components/AudioComponent.h"
 #include "../Interaction/InteractionComponent.h"
 #include "../Interaction/InteractiveActor.h"
+#include "SanityComponent.h"
 
 // Sets default values
 AWalkPawn::AWalkPawn()
@@ -27,8 +28,12 @@ AWalkPawn::AWalkPawn()
 	MusicPlayerComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("MusicPlayer"));
 	MusicPlayerComponent->SetupAttachment(DefaultSceneRoot);
 
+	LowSanityAmbienceComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("LowSanityAmbience"));
+	LowSanityAmbienceComponent->SetupAttachment(DefaultSceneRoot);
+
 	SplineMovementComponent = CreateDefaultSubobject<USplineMovementComponent>(TEXT("SplineMovementComponent"));
 	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("InteractionComponent"));
+	SanityComponent = CreateDefaultSubobject<USanityComponent>(TEXT("SanityComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -37,6 +42,7 @@ void AWalkPawn::BeginPlay()
 	Super::BeginPlay();
 
 	MusicPlayerComponent->SetPaused(true);
+	SanityComponent->OnSanityReachedZero.AddDynamic(this, &AWalkPawn::KillPlayer);
 }
 
 // Called every frame
@@ -81,6 +87,7 @@ void AWalkPawn::Look(const FInputActionValue& Value)
 void AWalkPawn::ToggleMusic(const FInputActionValue& Value)
 {
 	MusicPlayerComponent->SetPaused(!MusicPlayerComponent->bIsPaused);
+	OnMusicStateChanged.Broadcast(MusicPlayerComponent->bIsPaused);
 }
 
 void AWalkPawn::ChangeSong(const FInputActionValue& Value)
@@ -102,5 +109,10 @@ void AWalkPawn::Interact(const FInputActionValue& Value)
 void AWalkPawn::TogglePause(const FInputActionValue& Value)
 {
 	UGameplayStatics::SetGamePaused(GetWorld(), !UGameplayStatics::IsGamePaused(GetWorld()));
+}
+
+void AWalkPawn::KillPlayer()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Player is dead!"))
 }
 
