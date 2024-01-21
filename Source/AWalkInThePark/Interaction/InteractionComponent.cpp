@@ -14,13 +14,11 @@ UInteractionComponent::UInteractionComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-
 // Called when the game starts
 void UInteractionComponent::BeginPlay()
 {
 	Super::BeginPlay();	
 }
-
 
 // Called every frame
 void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -50,24 +48,10 @@ void UInteractionComponent::TraceForInteractiveActor()
 
 void UInteractionComponent::GetStartAndEndOfTrace(FVector& OutStart, FVector& OutEnd) const
 {
-	AActor* Owner = GetOwner();
-	APawn* PawnOwner = Cast<APawn>(Owner);
+	APawn* Owner = Cast<APawn>(GetOwner());
+	if (!Owner) return;
+	if (!Owner->HasActiveCameraComponent()) return;
 
-	OutStart = Owner->GetActorLocation() + TraceStart;
-	if (PawnOwner)
-	{
-		if (PawnOwner->HasActiveCameraComponent())
-		{
-			OutStart = PawnOwner->FindComponentByClass<UCameraComponent>()->GetComponentLocation();
-		}
-	}
-
-	OutEnd = OutStart + UKismetMathLibrary::GetForwardVector(Owner->GetActorRotation()) * TraceDistance;
-	if (PawnOwner)
-	{
-		if (PawnOwner->HasActiveCameraComponent())
-		{
-			OutEnd = OutStart + PawnOwner->FindComponentByClass<UCameraComponent>()->GetForwardVector() * TraceDistance;
-		}
-	}
+	OutStart = Owner->FindComponentByClass<UCameraComponent>()->GetComponentLocation();
+	OutEnd = OutStart + Owner->FindComponentByClass<UCameraComponent>()->GetForwardVector() * TraceDistance;
 }

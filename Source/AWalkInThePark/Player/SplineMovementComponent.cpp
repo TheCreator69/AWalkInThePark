@@ -15,7 +15,6 @@ USplineMovementComponent::USplineMovementComponent()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-
 void USplineMovementComponent::UpdateDistanceAlongSpline(float DeltaTime)
 {
 	DistanceAlongSpline += DeltaTime * CurrentSpeed;
@@ -23,21 +22,12 @@ void USplineMovementComponent::UpdateDistanceAlongSpline(float DeltaTime)
 
 void USplineMovementComponent::SetOwnerTransformAlongSpline() const
 {
-	AActor* Owner = GetOwner();
+	APawn* Owner = Cast<APawn>(GetOwner());
+	if (!Owner) return;
+
 	FTransform SplineTransform = CurrentPath->Spline->GetTransformAtDistanceAlongSpline(DistanceAlongSpline, ESplineCoordinateSpace::World);
 	Owner->SetActorLocation(SplineTransform.GetLocation());
-
-	// If owner is a pawn, use control rotation to prevent camera rotating weirdly if the component has a relative offset on any axis
-	APawn* PawnOwner = Cast<APawn>(Owner);
-	if (PawnOwner)
-	{
-		PawnOwner->GetController()->SetControlRotation(SplineTransform.Rotator() + CameraRotationOffset);
-	}
-	else
-	{
-		Owner->SetActorRotation(SplineTransform.Rotator() + CameraRotationOffset);
-	}
-	
+	Owner->GetController()->SetControlRotation(SplineTransform.Rotator() + CameraRotationOffset);
 }
 
 // Called when the game starts
@@ -45,7 +35,6 @@ void USplineMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
 }
-
 
 // Called every frame
 void USplineMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -64,7 +53,17 @@ void USplineMovementComponent::AddToMovementSpeed(float SpeedOffsetPerSecond)
 
 void USplineMovementComponent::AddCameraRotationOffset(FRotator Offset)
 {
-	CameraRotationOffset += Offset;
+	SetCameraRotationOffset(CameraRotationOffset += Offset);
+}
+
+FRotator USplineMovementComponent::GetCameraRotationOffset() const
+{
+	return CameraRotationOffset;
+}
+
+void USplineMovementComponent::SetCameraRotationOffset(FRotator NewOffset)
+{
+	CameraRotationOffset = NewOffset;
 	CameraRotationOffset.Pitch = FMath::Clamp(CameraRotationOffset.Pitch, -MaxPitchOffset, MaxPitchOffset);
 	CameraRotationOffset.Yaw = FMath::Clamp(CameraRotationOffset.Yaw, -MaxYawOffset, MaxYawOffset);
 }

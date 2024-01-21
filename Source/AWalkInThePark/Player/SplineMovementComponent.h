@@ -49,7 +49,7 @@ private:
 
 	/*
 	* How much the camera's rotation should differ from the spline's at owner's current location.
-	* Used for turning the camera while walking
+	* Used for turning the camera while walking.
 	*/
 	FRotator CameraRotationOffset = FRotator(0.f, 0.f, 0.f);
 
@@ -61,6 +61,20 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	/*
+	* Add the specified amount to the current movement speed.
+	* The amount is added in 1 second, so if the function is only called for 0.1 seconds, only 10% of the full amount is added.
+	* That way, the caller can estimate how much speed is actually being added and the function is kept frame rate independent.
+	*/ 
 	void AddToMovementSpeed(float SpeedOffsetPerSecond);
+
+	// Add a rotation offset to the player's camera. The yaw and pitch are capped based on the values provided to this component
+	UFUNCTION(BlueprintCallable)
 	void AddCameraRotationOffset(FRotator Offset);
+
+	// Get the current camera rotation offset for the player's camera.
+	FRotator GetCameraRotationOffset() const;
+
+	// Set the rotation offset of the player's camera. The yaw and pitch are capped based on the values provided to this component
+	void SetCameraRotationOffset(FRotator NewOffset);
 };
