@@ -14,12 +14,26 @@ struct FAggressionChangeInfo
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditDefaultsOnly)
-	double BaseChange = 0.0;
-	UPROPERTY(EditDefaultsOnly)
-	double OffsetMin = 0.0;
-	UPROPERTY(EditDefaultsOnly)
-	double OffsetMax = 0.0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	double BaseChange;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	double OffsetMin;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	double OffsetMax;
+
+	FAggressionChangeInfo()
+	{
+		BaseChange = 0.0;
+		OffsetMin = 0.0;
+		OffsetMax = 0.0;
+	}
+
+	FAggressionChangeInfo(double Base, double Min, double Max)
+	{
+		BaseChange = Base;
+		OffsetMin = Min;
+		OffsetMax = Max;
+	}
 };
 
 // Base class for the park and water monsters that stalk the player throughout the game.
@@ -54,11 +68,11 @@ public:
 
 	// Values for increasing monster aggression
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Aggression")
-	FAggressionChangeInfo AggressionIncreaseInfo; //0.005, 0.0025, 0.004
+	FAggressionChangeInfo AggressionIncreaseInfo = FAggressionChangeInfo(0.005, 0.0025, 0.004);
 
 	// Values for decreasing monster aggression
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Aggression")
-	FAggressionChangeInfo AggressionDecreaseInfo; //0.01, 0.007, 0.009
+	FAggressionChangeInfo AggressionDecreaseInfo = FAggressionChangeInfo(0.01, 0.007, 0.009);
 
 	/*
 	* Curve that scale aggression changes based on how close the player's is to their max.
@@ -89,6 +103,10 @@ public:
 	// Deactivate the monster so it can become "passive" again. Also resets monster's aggression
 	UFUNCTION(BlueprintCallable, Category = "Stalking")
 	void DeactivateMonster();
+
+	// Get the monster's current aggression
+	UFUNCTION(BlueprintCallable, Category = "Aggression")
+	double GetAggression() const;
 
 	// Set the monster's aggression directly.
 	UFUNCTION(BlueprintCallable, Category = "Aggression")

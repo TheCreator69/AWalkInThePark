@@ -55,6 +55,11 @@ void AWalkMonster::DeactivateMonster()
 	Aggression = 0.f;
 }
 
+double AWalkMonster::GetAggression() const
+{
+	return Aggression;
+}
+
 void AWalkMonster::SetAggression(double NewAggression)
 {
 	Aggression = FMath::Clamp(NewAggression, 0.f, 1.f);
@@ -65,6 +70,7 @@ void AWalkMonster::SetAggression(double NewAggression)
 
 		PlayerPawn->KillPlayer();
 	}
+	UE_LOG(LogTemp, Warning, TEXT("Aggression: %f"), Aggression)
 }
 
 void AWalkMonster::ChangeAggressionPeriodically()
@@ -81,7 +87,6 @@ void AWalkMonster::ChangeAggressionPeriodically()
 		double AggressionChange = CalculateAggressionChange(false, Info->BaseChange, Info->OffsetMin, Info->OffsetMax);
 		SetAggression(Aggression + AggressionChange);
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Aggression: %f"), Aggression)
 }
 
 double AWalkMonster::CalculateAggressionChange(bool bLowerAggression, float SpeedPercentageMultiplier, double OffsetMin, double OffsetMax)
@@ -103,10 +108,7 @@ double AWalkMonster::CalculateAggressionChange(bool bLowerAggression, float Spee
 		AggressionChange = SpeedPercentage;
 	}
 	AggressionChange *= SpeedPercentageMultiplier;
-
-	// Add a random offset in a range to make monster more unpredictable
-	FRandomStream Random = FRandomStream(1337);
-	AggressionChange += Random.FRandRange(OffsetMin, OffsetMax);
+	AggressionChange += FMath::RandRange(OffsetMin, OffsetMax);
 
 	return AggressionChange;
 }
@@ -127,3 +129,4 @@ bool AWalkMonster::IsPlayerStaringDownMonster()
 	if (DotProduct > 0.7) return true;
 	return false;
 }
+
