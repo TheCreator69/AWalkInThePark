@@ -77,4 +77,7 @@ public:
 
 	// Set the rotation offset of the player's camera. The yaw and pitch are capped based on the values provided to this component
 	void SetCameraRotationOffset(FRotator NewOffset);
+
+	// Return how close the player is at their max speed, ranging from 0 (standing still) to 1 (at max speed)
+	float GetPlayerSpeedPercentage();
 };

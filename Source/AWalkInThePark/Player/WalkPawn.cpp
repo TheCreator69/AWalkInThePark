@@ -71,6 +71,11 @@ void AWalkPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Input->BindAction(TogglePauseAction, ETriggerEvent::Triggered, this, &AWalkPawn::TogglePause);
 }
 
+void AWalkPawn::KillPlayer()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Player is dead!"))
+}
+
 void AWalkPawn::ChangeSpeed(const FInputActionValue& Value)
 {
 	float ActionValue = Value.Get<float>();
@@ -109,10 +114,5 @@ void AWalkPawn::Interact(const FInputActionValue& Value)
 void AWalkPawn::TogglePause(const FInputActionValue& Value)
 {
 	UGameplayStatics::SetGamePaused(GetWorld(), !UGameplayStatics::IsGamePaused(GetWorld()));
-}
-
-void AWalkPawn::KillPlayer()
-{
-	UE_LOG(LogTemp, Warning, TEXT("Player is dead!"))
 }
 

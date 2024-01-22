@@ -47,7 +47,6 @@ void USanityComponent::SetSanity(float NewSanity)
 	{
 		OnSanityReachedZero.Broadcast();
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Sanity set: %f"), Sanity)
 }
 
 void USanityComponent::SetDecreaseSanity(bool bNewDecreaseSanity)

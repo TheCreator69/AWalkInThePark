@@ -113,6 +113,10 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	// Kill the player!!!
+	UFUNCTION()
+	void KillPlayer();
+
 private:
 	// Accelerate/decelerate the pawn along a spline
 	UFUNCTION()
@@ -137,8 +141,5 @@ private:
 	// Pause/Unpause the game
 	UFUNCTION()
 	void TogglePause(const FInputActionValue& Value);
-
-	UFUNCTION()
-	void KillPlayer();
 
 };

@@ -68,3 +68,8 @@ void USplineMovementComponent::SetCameraRotationOffset(FRotator NewOffset)
 	CameraRotationOffset.Yaw = FMath::Clamp(CameraRotationOffset.Yaw, -MaxYawOffset, MaxYawOffset);
 }
 
+float USplineMovementComponent::GetPlayerSpeedPercentage()
+{
+	return CurrentSpeed / MaxSpeed;
+}
+
