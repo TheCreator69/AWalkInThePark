@@ -79,5 +79,11 @@ public:
 	void SetCameraRotationOffset(FRotator NewOffset);
 
 	// Return how close the player is at their max speed, ranging from 0 (standing still) to 1 (at max speed)
-	float GetPlayerSpeedPercentage();
+	float GetPlayerSpeedPercentage() const;
+
+	/*
+	* Get the rotation of the currently active spline where the player is standing.
+	* Doesn't take camera offset into account, so it only represents the player's control rotation if the player is facing straight ahead
+	*/
+	FRotator GetPlayerSplineRotation() const;
 };

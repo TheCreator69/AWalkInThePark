@@ -6,6 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "WalkMonster.generated.h"
 
+class UPlayerFollowComponent;
+class UMonsterFootstepAudioComponent;
+
 USTRUCT(BlueprintType)
 struct FAggressionChangeInfo
 {
@@ -36,6 +39,14 @@ public:
 	// Debug cube used to display the monster's location in-game
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UStaticMeshComponent> DebugCube;
+
+	// Component used to snap to player pawn's location with offset but without inheriting its rotation
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UPlayerFollowComponent> PlayerFollowComponent;
+
+	// Component used to schedule and play monster footstep audio under certain conditions
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UMonsterFootstepAudioComponent> FootstepAudioComponent;
 
 	// The time between intervals where the monster's aggression changes.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Aggression")

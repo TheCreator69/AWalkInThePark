@@ -68,8 +68,13 @@ void USplineMovementComponent::SetCameraRotationOffset(FRotator NewOffset)
 	CameraRotationOffset.Yaw = FMath::Clamp(CameraRotationOffset.Yaw, -MaxYawOffset, MaxYawOffset);
 }
 
-float USplineMovementComponent::GetPlayerSpeedPercentage()
+float USplineMovementComponent::GetPlayerSpeedPercentage() const
 {
 	return CurrentSpeed / MaxSpeed;
+}
+
+FRotator USplineMovementComponent::GetPlayerSplineRotation() const
+{
+	return CurrentPath->Spline->GetTransformAtDistanceAlongSpline(DistanceAlongSpline, ESplineCoordinateSpace::World).Rotator();
 }
 

@@ -7,6 +7,8 @@
 #include "Math/RandomStream.h"
 #include "../Player/WalkPawn.h"
 #include "../Player/SplineMovementComponent.h"
+#include "PlayerFollowComponent.h"
+#include "MonsterFootstepAudioComponent.h"
 
 // Sets default values
 AWalkMonster::AWalkMonster()
@@ -19,6 +21,11 @@ AWalkMonster::AWalkMonster()
 
 	DebugCube = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("DebugCube"));
 	DebugCube->SetupAttachment(DefaultSceneRoot);
+
+	FootstepAudioComponent = CreateDefaultSubobject<UMonsterFootstepAudioComponent>(TEXT("FootstepAudioComponent"));
+	FootstepAudioComponent->SetupAttachment(DefaultSceneRoot);
+
+	PlayerFollowComponent = CreateDefaultSubobject<UPlayerFollowComponent>(TEXT("PlayerFollowComponent"));
 }
 
 // Called when the game starts or when spawned
