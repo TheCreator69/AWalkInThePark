@@ -7,6 +7,7 @@
 #include "SplineMovementComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "../Core/WalkDefines.h"
 
 // Sets default values for this component's properties
 USanityComponent::USanityComponent()
@@ -47,11 +48,13 @@ void USanityComponent::SetSanity(float NewSanity)
 	{
 		OnSanityReachedZero.Broadcast();
 	}
+	UE_LOGFMT(LogSanity, Verbose, "Sanity changed: {0}", Sanity);
 }
 
 void USanityComponent::SetDecreaseSanity(bool bNewDecreaseSanity)
 {
 	bDecreaseSanity = bNewDecreaseSanity;
+	UE_LOGFMT(LogSanity, Log, "Sanity decrease changed: {0}", bNewDecreaseSanity);
 }
 
 void USanityComponent::UpdateSanity(float DeltaTime)
@@ -116,5 +119,7 @@ void USanityComponent::PlayIntrusiveThought()
 	AWalkPawn* Owner = Cast<AWalkPawn>(GetOwner());
 	float VolumeMultiplier = (0.5f - Sanity) * 1.2f + 0.4f;
 	UGameplayStatics::PlaySound2D(GetWorld(), Owner->IntrusiveThoughtSoundEffect, VolumeMultiplier);
+
+	UE_LOGFMT(LogSanity, Verbose, "Intrusive thought audio played with volume multiplier: {0}", VolumeMultiplier);
 }
 

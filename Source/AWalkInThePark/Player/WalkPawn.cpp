@@ -12,6 +12,7 @@
 #include "../Interaction/InteractionComponent.h"
 #include "../Interaction/InteractiveActor.h"
 #include "SanityComponent.h"
+#include "../Core/WalkDefines.h"
 
 // Sets default values
 AWalkPawn::AWalkPawn()
@@ -73,7 +74,7 @@ void AWalkPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AWalkPawn::KillPlayer()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Player is dead!"))
+	UE_LOGFMT(LogWalkPlayer, Display, "Player is dead!");
 }
 
 void AWalkPawn::ChangeSpeed(const FInputActionValue& Value)
@@ -81,18 +82,24 @@ void AWalkPawn::ChangeSpeed(const FInputActionValue& Value)
 	float ActionValue = Value.Get<float>();
 	bool bSlowDown = ActionValue < 0.f;
 	SplineMovementComponent->AddToMovementSpeed((bSlowDown ? 120.f : 30.f) * ActionValue);
+
+	UE_LOGFMT(LogWalkPlayer, Verbose, "Speed change input triggered with ActionValue: {0}", ActionValue);
 }
 
 void AWalkPawn::Look(const FInputActionValue& Value)
 {
 	FVector2D ActionValue = Value.Get<FVector2D>();
 	SplineMovementComponent->AddCameraRotationOffset(FRotator(ActionValue.Y, ActionValue.X, 0.f));
+
+	UE_LOGFMT(LogWalkPlayer, Verbose, "Look input triggered with ActionValue: {0}", ActionValue.ToString());
 }
 
 void AWalkPawn::ToggleMusic(const FInputActionValue& Value)
 {
 	MusicPlayerComponent->SetPaused(!MusicPlayerComponent->bIsPaused);
 	OnMusicStateChanged.Broadcast(MusicPlayerComponent->bIsPaused);
+
+	UE_LOGFMT(LogWalkPlayer, Verbose, "Toggle music input triggered");
 }
 
 void AWalkPawn::ChangeSong(const FInputActionValue& Value)
@@ -101,6 +108,8 @@ void AWalkPawn::ChangeSong(const FInputActionValue& Value)
 
 	MusicPlayerComponent->SetSound(bIsPlayingWaterMask ? MusicTrackParkMask : MusicTrackWaterMask);
 	bIsPlayingWaterMask = !bIsPlayingWaterMask;
+
+	UE_LOGFMT(LogWalkPlayer, Verbose, "Change song input triggered");
 }
 
 void AWalkPawn::Interact(const FInputActionValue& Value)
@@ -109,10 +118,14 @@ void AWalkPawn::Interact(const FInputActionValue& Value)
 	if (!InteractionActor) return;
 
 	IInteractiveActor::Execute_Interact(InteractionActor, this);
+
+	UE_LOGFMT(LogWalkPlayer, Verbose, "Interaction input triggered");
 }
 
 void AWalkPawn::TogglePause(const FInputActionValue& Value)
 {
 	UGameplayStatics::SetGamePaused(GetWorld(), !UGameplayStatics::IsGamePaused(GetWorld()));
+
+	UE_LOGFMT(LogWalkPlayer, Verbose, "Pause input triggered");
 }
 

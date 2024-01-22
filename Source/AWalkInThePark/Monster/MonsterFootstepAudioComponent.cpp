@@ -3,6 +3,7 @@
 
 #include "MonsterFootstepAudioComponent.h"
 #include "WalkMonster.h"
+#include "../Core/WalkDefines.h"
 
 // Sets default values for this component's properties
 UMonsterFootstepAudioComponent::UMonsterFootstepAudioComponent()
@@ -48,12 +49,12 @@ void UMonsterFootstepAudioComponent::ExecuteAggressionThresholdFunctions(double&
 	if (HighAggressionThreshold == TEnumAsByte<ThresholdCrossing>(Upwards))
 	{
 		SetSound(HighAggressionFootsteps);
-		UE_LOG(LogTemp, Warning, TEXT("High aggression sound set!"))
+		UE_LOGFMT(LogMonsterSound, Log, "High aggression sound set");
 	}
 	else if (HighAggressionThreshold == TEnumAsByte<ThresholdCrossing>(Downwards))
 	{
 		SetSound(MediumAggressionFootsteps);
-		UE_LOG(LogTemp, Warning, TEXT("Medium aggression sound set"))
+		UE_LOGFMT(LogMonsterSound, Log, "Medium aggression sound set");
 	}
 
 	// Should start making sound?
@@ -61,7 +62,6 @@ void UMonsterFootstepAudioComponent::ExecuteAggressionThresholdFunctions(double&
 	if (MediumAggressionThreshold == TEnumAsByte<ThresholdCrossing>(Upwards))
 	{
 		StartMakingSound();
-		UE_LOG(LogTemp, Warning, TEXT("Start making sound!"))
 	}
 
 	// Should stop making sound?
@@ -69,7 +69,6 @@ void UMonsterFootstepAudioComponent::ExecuteAggressionThresholdFunctions(double&
 	if (NoSoundThreshold == TEnumAsByte<ThresholdCrossing>(Downwards))
 	{
 		StopMakingSound();
-		UE_LOG(LogTemp, Warning, TEXT("Stop making sound!"))
 	}
 }
 
@@ -77,12 +76,13 @@ void UMonsterFootstepAudioComponent::StartMakingSound()
 {
 	OnAudioFinished.AddDynamic(this, &UMonsterFootstepAudioComponent::ScheduleNextSound);
 	ScheduleNextSound();
+	UE_LOGFMT(LogMonsterSound, Log, "Start making sound");
 }
 
 void UMonsterFootstepAudioComponent::ScheduleNextSound()
 {
 	GetWorld()->GetTimerManager().SetTimer(FootstepTimerHandle, this, &UMonsterFootstepAudioComponent::PlaySoundAtProperVolume, FMath::RandRange(1.0, 2.0));
-	UE_LOG(LogTemp, Warning, TEXT("Next sound scheduled..."))
+	UE_LOGFMT(LogMonsterSound, Log, "Next sound scheduled...");
 }
 
 void UMonsterFootstepAudioComponent::PlaySoundAtProperVolume()
@@ -91,13 +91,14 @@ void UMonsterFootstepAudioComponent::PlaySoundAtProperVolume()
 	float Multiplier = FMath::Lerp<double, double>(0.25, 1.25, VolumeAlpha);
 	SetVolumeMultiplier(Multiplier);
 	Play();
-	UE_LOG(LogTemp, Warning, TEXT("Playing sound!"))
+	UE_LOGFMT(LogMonsterSound, Log, "Playing sound with volume multiplier: {0}", Multiplier);
 }
 
 void UMonsterFootstepAudioComponent::StopMakingSound()
 {
 	GetWorld()->GetTimerManager().ClearTimer(FootstepTimerHandle);
 	OnAudioFinished.RemoveDynamic(this, &UMonsterFootstepAudioComponent::ScheduleNextSound);
+	UE_LOGFMT(LogMonsterSound, Log, "Stop making sound");
 }
 
 TEnumAsByte<ThresholdCrossing> UMonsterFootstepAudioComponent::AggressionCrossedThreshold(double& OldAggression, double& NewAggression, double Threshold)

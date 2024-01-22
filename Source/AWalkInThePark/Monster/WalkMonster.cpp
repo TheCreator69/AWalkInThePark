@@ -9,6 +9,7 @@
 #include "../Player/SplineMovementComponent.h"
 #include "PlayerFollowComponent.h"
 #include "MonsterFootstepAudioComponent.h"
+#include "../Core/WalkDefines.h"
 
 // Sets default values
 AWalkMonster::AWalkMonster()
@@ -47,12 +48,14 @@ void AWalkMonster::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void AWalkMonster::ActivateMonster()
 {
 	GetWorld()->GetTimerManager().SetTimer(AggressionChangeTimerHandle, this, &AWalkMonster::ChangeAggressionPeriodically, AggressionChangeRate, true);
+	UE_LOGFMT(LogMonster, Display, "Activated monster");
 }
 
 void AWalkMonster::DeactivateMonster()
 {
 	GetWorld()->GetTimerManager().ClearTimer(AggressionChangeTimerHandle);
 	Aggression = 0.f;
+	UE_LOGFMT(LogMonster, Display, "Deactivated monster");
 }
 
 double AWalkMonster::GetAggression() const
@@ -70,7 +73,7 @@ void AWalkMonster::SetAggression(double NewAggression)
 
 		PlayerPawn->KillPlayer();
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Aggression: %f"), Aggression)
+	UE_LOGFMT(LogMonster, Verbose, "Aggression set: {0}", Aggression);
 }
 
 void AWalkMonster::ChangeAggressionPeriodically()
@@ -80,12 +83,14 @@ void AWalkMonster::ChangeAggressionPeriodically()
 		FAggressionChangeInfo* Info = &AggressionIncreaseInfo;
 		double AggressionChange = CalculateAggressionChange(true, Info->BaseChange, Info->OffsetMin, Info->OffsetMax);
 		SetAggression(Aggression - AggressionChange);
+		UE_LOGFMT(LogMonster, Verbose, "Player is staring down monster: {0}", GetName());
 	}
 	else
 	{
 		FAggressionChangeInfo* Info = &AggressionDecreaseInfo;
 		double AggressionChange = CalculateAggressionChange(false, Info->BaseChange, Info->OffsetMin, Info->OffsetMax);
 		SetAggression(Aggression + AggressionChange);
+		UE_LOGFMT(LogMonster, Verbose, "Player is NOT staring down monster: {0}", GetName());
 	}
 }
 

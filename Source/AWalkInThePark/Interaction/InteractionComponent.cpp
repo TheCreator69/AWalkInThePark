@@ -5,6 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "InteractiveActor.h"
+#include "../Core/WalkDefines.h"
 
 // Sets default values for this component's properties
 UInteractionComponent::UInteractionComponent()
@@ -39,10 +40,12 @@ void UInteractionComponent::TraceForInteractiveActor()
 	if (OutHit.bBlockingHit && OutHit.GetActor()->Implements<UInteractiveActor>())
 	{
 		TargetedActor = OutHit.GetActor();
+		UE_LOGFMT(LogInteraction, Verbose, "Interactive actor being targeted: {0}", TargetedActor->GetName());
 	}
 	else
 	{
 		TargetedActor = nullptr;
+		UE_LOGFMT(LogInteraction, Verbose, "No interactive actor being targeted");
 	}
 }
 

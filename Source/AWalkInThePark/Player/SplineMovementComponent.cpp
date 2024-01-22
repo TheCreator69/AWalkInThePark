@@ -6,6 +6,7 @@
 #include "WalkPath.h"
 #include "Components/SplineComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "../Core/WalkDefines.h"
 
 // Sets default values for this component's properties
 USplineMovementComponent::USplineMovementComponent()
@@ -18,6 +19,7 @@ USplineMovementComponent::USplineMovementComponent()
 void USplineMovementComponent::UpdateDistanceAlongSpline(float DeltaTime)
 {
 	DistanceAlongSpline += DeltaTime * CurrentSpeed;
+	UE_LOGFMT(LogSplineMovement, Verbose, "Distance along spline updated: {0}", DistanceAlongSpline);
 }
 
 void USplineMovementComponent::SetOwnerTransformAlongSpline() const
@@ -47,8 +49,10 @@ void USplineMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 
 void USplineMovementComponent::AddToMovementSpeed(float SpeedOffsetPerSecond)
 {
-	SpeedOffsetPerSecond *= UGameplayStatics::GetWorldDeltaSeconds(GetWorld());
-	CurrentSpeed = FMath::Clamp(CurrentSpeed + SpeedOffsetPerSecond, 0.f, MaxSpeed);
+	float SpeedOffsetThisTick = SpeedOffsetPerSecond * UGameplayStatics::GetWorldDeltaSeconds(GetWorld());
+	CurrentSpeed = FMath::Clamp(CurrentSpeed + SpeedOffsetThisTick, 0.f, MaxSpeed);
+
+	UE_LOGFMT(LogSplineMovement, Verbose, "Movement speed changed by offset: {0}", SpeedOffsetThisTick);
 }
 
 void USplineMovementComponent::AddCameraRotationOffset(FRotator Offset)
@@ -66,6 +70,8 @@ void USplineMovementComponent::SetCameraRotationOffset(FRotator NewOffset)
 	CameraRotationOffset = NewOffset;
 	CameraRotationOffset.Pitch = FMath::Clamp(CameraRotationOffset.Pitch, -MaxPitchOffset, MaxPitchOffset);
 	CameraRotationOffset.Yaw = FMath::Clamp(CameraRotationOffset.Yaw, -MaxYawOffset, MaxYawOffset);
+
+	UE_LOGFMT(LogSplineMovement, Verbose, "Camera rotation offset set: {0}", CameraRotationOffset.ToCompactString());
 }
 
 float USplineMovementComponent::GetPlayerSpeedPercentage() const
