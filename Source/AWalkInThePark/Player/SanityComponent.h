@@ -6,8 +6,6 @@
 #include "Components/ActorComponent.h"
 #include "SanityComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FSanityReachedZero);
-
 // Component managing player's current sanity (capped between 0 and 1 no cap) and the effects that come with low sanity
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class AWALKINTHEPARK_API USanityComponent : public UActorComponent
@@ -58,10 +56,6 @@ public:
 	// Activate/deactivate decreasing sanity. If deactivated, sanity will increase instead
 	UFUNCTION(BlueprintCallable, Category = "Sanity")
 	void SetDecreaseSanity(bool bNewDecreaseSanity);
-
-	// Event dispatched when sanity reaches zero
-	UPROPERTY(BlueprintAssignable, Category = "Sanity")
-	FSanityReachedZero OnSanityReachedZero;
 
 private:
 	float Sanity = 1.f;

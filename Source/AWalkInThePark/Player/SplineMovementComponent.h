@@ -68,6 +68,9 @@ public:
 	*/ 
 	void AddToMovementSpeed(float SpeedOffsetPerSecond);
 
+	// Reset player movement speed, stopping them
+	void StopPlayerMovement();
+
 	// Add a rotation offset to the player's camera. The yaw and pitch are capped based on the values provided to this component
 	UFUNCTION(BlueprintCallable)
 	void AddCameraRotationOffset(FRotator Offset);

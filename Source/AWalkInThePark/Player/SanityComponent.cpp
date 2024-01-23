@@ -48,7 +48,10 @@ void USanityComponent::SetSanity(float NewSanity)
 	Sanity = FMath::Clamp(NewSanity, 0.f, 1.f);
 	if (Sanity == 0.f)
 	{
-		OnSanityReachedZero.Broadcast();
+		AWalkPawn* Owner = Cast<AWalkPawn>(GetOwner());
+		if (!Owner) return;
+
+		Owner->KillPlayer(TEnumAsByte<PlayerDeathReason>(Insanity));
 	}
 	UE_LOGFMT(LogSanity, Verbose, "Sanity changed: {0}", Sanity);
 }

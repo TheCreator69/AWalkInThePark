@@ -14,10 +14,26 @@ class UCameraComponent;
 class UInteractionComponent;
 class USanityComponent;
 class UCapsuleComponent;
+class AParkBench;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMusicPlayStateChanged, bool, bIsPaused);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartOverlapSafeZone);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEndOverlapSafeZone);
+
+UENUM(BlueprintType)
+enum PlayerDeathReason
+{
+	Insanity UMETA(DisplayName = "Insanity"),
+	Monster UMETA(DisplayName = "Monster"),
+};
+
+UENUM(BlueprintType)
+enum SitStatus
+{
+	ForcedSitting UMETA(DisplayName = "Forced To Sit"),
+	Sitting UMETA(DisplayName = "Sitting"),
+	Standing UMETA(DisplayName = "Standing"),
+};
 
 // Default pawn implementing spline-based movement and other essential player functionality
 UCLASS()
@@ -113,6 +129,13 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Safe Zone")
 	FEndOverlapSafeZone OnEndOverlapSafeZone;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Park Bench")
+	TObjectPtr<AParkBench> ParkBenchSatOn;
+
+	// Is the player currently sitting on a park bench?
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Park Bench")
+	TEnumAsByte<SitStatus> SitStatus = Standing;
+
 private:
 	// Is the current music being played the track that masks the water monster?
 	bool bIsPlayingWaterMask = true;
@@ -128,9 +151,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	// Kill the player!!!
+	// Kill the player!!! And also specify a reason
 	UFUNCTION()
-	void KillPlayer();
+	void KillPlayer(TEnumAsByte<PlayerDeathReason> Reason);
 
 private:
 	// Accelerate/decelerate the pawn along a spline

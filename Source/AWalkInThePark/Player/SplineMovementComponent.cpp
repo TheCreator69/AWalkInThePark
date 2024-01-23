@@ -55,6 +55,11 @@ void USplineMovementComponent::AddToMovementSpeed(float SpeedOffsetPerSecond)
 	UE_LOGFMT(LogSplineMovement, Verbose, "Movement speed changed by offset: {0}", SpeedOffsetThisTick);
 }
 
+void USplineMovementComponent::StopPlayerMovement()
+{
+	CurrentSpeed = 0.f;
+}
+
 void USplineMovementComponent::AddCameraRotationOffset(FRotator Offset)
 {
 	SetCameraRotationOffset(CameraRotationOffset += Offset);

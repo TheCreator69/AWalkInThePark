@@ -84,7 +84,7 @@ void AWalkMonster::SetAggression(double NewAggression)
 		AWalkPawn* PlayerPawn = Cast<AWalkPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
 		if (!PlayerPawn) return;
 
-		PlayerPawn->KillPlayer();
+		PlayerPawn->KillPlayer(TEnumAsByte<PlayerDeathReason>(Monster));
 	}
 	UE_LOGFMT(LogMonster, Verbose, "Aggression set: {0}", Aggression);
 }

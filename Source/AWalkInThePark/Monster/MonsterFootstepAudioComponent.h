@@ -59,8 +59,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Threshold")
 	FSoundThresholds SoundThresholds;
 
-
-
 private:
 	TObjectPtr<AWalkMonster> Owner;
 

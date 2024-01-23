@@ -14,6 +14,7 @@
 #include "../Interaction/InteractiveActor.h"
 #include "SanityComponent.h"
 #include "../Core/WalkDefines.h"
+#include "../Environment/ParkBench.h"
 
 // Sets default values
 AWalkPawn::AWalkPawn()
@@ -47,7 +48,6 @@ void AWalkPawn::BeginPlay()
 	Super::BeginPlay();
 
 	MusicPlayerComponent->SetPaused(true);
-	SanityComponent->OnSanityReachedZero.AddUniqueDynamic(this, &AWalkPawn::KillPlayer);
 }
 
 // Called every frame
@@ -76,18 +76,27 @@ void AWalkPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Input->BindAction(TogglePauseAction, ETriggerEvent::Triggered, this, &AWalkPawn::TogglePause);
 }
 
-void AWalkPawn::KillPlayer()
+void AWalkPawn::KillPlayer(TEnumAsByte<PlayerDeathReason> Reason)
 {
-	UE_LOGFMT(LogWalkPlayer, Display, "Player is dead!");
+	UE_LOGFMT(LogWalkPlayer, Display, "Player is dead with reason: {0}", Reason.GetValue());
 }
 
 void AWalkPawn::ChangeSpeed(const FInputActionValue& Value)
 {
 	float ActionValue = Value.Get<float>();
-	bool bSlowDown = ActionValue < 0.f;
-	SplineMovementComponent->AddToMovementSpeed((bSlowDown ? 120.f : 30.f) * ActionValue);
+	bool bSlowDown = ActionValue <= 0.f;
 
-	UE_LOGFMT(LogWalkPlayer, Verbose, "Speed change input triggered with ActionValue: {0}", ActionValue);
+	// Special case, for getting up by pressing forward key/moving joystick forward
+	// TODO: Move this to its own function and change the input mapping context when player is sitting down?
+	if (SitStatus == Sitting && !bSlowDown && ParkBenchSatOn)
+	{
+		ParkBenchSatOn->GetUp();
+	}
+	else
+	{
+		SplineMovementComponent->AddToMovementSpeed((bSlowDown ? 120.f : 30.f) * ActionValue);
+		UE_LOGFMT(LogWalkPlayer, Verbose, "Speed change input triggered with ActionValue: {0}", ActionValue);
+	}
 }
 
 void AWalkPawn::Look(const FInputActionValue& Value)

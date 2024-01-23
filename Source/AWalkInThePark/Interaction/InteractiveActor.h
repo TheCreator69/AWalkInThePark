@@ -29,4 +29,8 @@ public:
 	// The on-screen prompt to show when the player hovers over this actor
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Interaction")
 	FText GetInteractionPrompt();
+
+	// Can this actor be interacted with?
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Interaction")
+	bool IsInteractive();
 };
