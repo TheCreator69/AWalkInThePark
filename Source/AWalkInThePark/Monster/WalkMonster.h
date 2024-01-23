@@ -89,6 +89,9 @@ private:
 	// Handle used to change monster's aggression periodically
 	FTimerHandle AggressionChangeTimerHandle;
 
+	// Can this monster be activated by ReactivateMonster()?
+	bool bCanBeReactivated = false;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -96,14 +99,20 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 public:
-	// Activate the monster so it can start stalking the player
+	// Activate the monster so it can start stalking the player. Used by gameplay events to first activate the monster
 	UFUNCTION(BlueprintCallable, Category = "Stalking")
 	void ActivateMonster();
 
+private:
+	// Reactivate the monster so it can start stalking the player. Used by safe zone to reactivate monster, is possible
+	UFUNCTION()
+	void ReactivateMonster();
+
 	// Deactivate the monster so it can become "passive" again. Also resets monster's aggression
-	UFUNCTION(BlueprintCallable, Category = "Stalking")
+	UFUNCTION()
 	void DeactivateMonster();
 
+public:
 	// Get the monster's current aggression
 	UFUNCTION(BlueprintCallable, Category = "Aggression")
 	double GetAggression() const;

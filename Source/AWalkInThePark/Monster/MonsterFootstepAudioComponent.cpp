@@ -82,7 +82,7 @@ void UMonsterFootstepAudioComponent::StartMakingSound()
 void UMonsterFootstepAudioComponent::ScheduleNextSound()
 {
 	GetWorld()->GetTimerManager().SetTimer(FootstepTimerHandle, this, &UMonsterFootstepAudioComponent::PlaySoundAtProperVolume, FMath::RandRange(1.0, 2.0));
-	UE_LOGFMT(LogMonsterSound, Log, "Next sound scheduled...");
+	UE_LOGFMT(LogMonsterSound, Verbose, "Next sound scheduled...");
 }
 
 void UMonsterFootstepAudioComponent::PlaySoundAtProperVolume()
@@ -91,7 +91,7 @@ void UMonsterFootstepAudioComponent::PlaySoundAtProperVolume()
 	float Multiplier = FMath::Lerp<double, double>(0.25, 1.25, VolumeAlpha);
 	SetVolumeMultiplier(Multiplier);
 	Play();
-	UE_LOGFMT(LogMonsterSound, Log, "Playing sound with volume multiplier: {0}", Multiplier);
+	UE_LOGFMT(LogMonsterSound, Verbose, "Playing sound with volume multiplier: {0}", Multiplier);
 }
 
 void UMonsterFootstepAudioComponent::StopMakingSound()

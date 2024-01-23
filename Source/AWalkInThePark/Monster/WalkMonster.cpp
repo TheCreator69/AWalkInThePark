@@ -34,8 +34,11 @@ void AWalkMonster::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Temporary - only used to test monster aggression
-	ActivateMonster();
+	AWalkPawn* Player = Cast<AWalkPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	if (!Player) return;
+
+	Player->OnBeginOverlapSafeZone.AddUniqueDynamic(this, &AWalkMonster::DeactivateMonster);
+	Player->OnEndOverlapSafeZone.AddUniqueDynamic(this, &AWalkMonster::ReactivateMonster);
 }
 
 void AWalkMonster::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -47,14 +50,24 @@ void AWalkMonster::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 void AWalkMonster::ActivateMonster()
 {
+	bCanBeReactivated = true;
+
 	GetWorld()->GetTimerManager().SetTimer(AggressionChangeTimerHandle, this, &AWalkMonster::ChangeAggressionPeriodically, AggressionChangeRate, true);
-	UE_LOGFMT(LogMonster, Display, "Activated monster");
+	UE_LOGFMT(LogMonster, Display, "Activated monster for the first time");
+}
+
+void AWalkMonster::ReactivateMonster()
+{
+	if (!bCanBeReactivated) return;
+
+	GetWorld()->GetTimerManager().SetTimer(AggressionChangeTimerHandle, this, &AWalkMonster::ChangeAggressionPeriodically, AggressionChangeRate, true);
+	UE_LOGFMT(LogMonster, Display, "Reactivated monster");
 }
 
 void AWalkMonster::DeactivateMonster()
 {
 	GetWorld()->GetTimerManager().ClearTimer(AggressionChangeTimerHandle);
-	Aggression = 0.f;
+	SetAggression(0.0);
 	UE_LOGFMT(LogMonster, Display, "Deactivated monster");
 }
 

@@ -25,7 +25,9 @@ void USanityComponent::BeginPlay()
 	AWalkPawn* Owner = Cast<AWalkPawn>(GetOwner());
 	if (!Owner) return;
 
-	Owner->OnMusicStateChanged.AddDynamic(this, &USanityComponent::SetDecreaseSanity);
+	Owner->OnMusicStateChanged.AddUniqueDynamic(this, &USanityComponent::SetDecreaseSanity);
+	Owner->OnBeginOverlapSafeZone.AddUniqueDynamic(this, &USanityComponent::ProhibitDecreasingSanityAndReset);
+	Owner->OnEndOverlapSafeZone.AddUniqueDynamic(this, &USanityComponent::AllowDecreasingSanity);
 }
 
 void USanityComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -54,11 +56,25 @@ void USanityComponent::SetSanity(float NewSanity)
 void USanityComponent::SetDecreaseSanity(bool bNewDecreaseSanity)
 {
 	bDecreaseSanity = bNewDecreaseSanity;
-	UE_LOGFMT(LogSanity, Log, "Sanity decrease changed: {0}", bNewDecreaseSanity);
+	UE_LOGFMT(LogSanity, Log, "Sanity decrease status changed: {0}", bNewDecreaseSanity);
+}
+
+void USanityComponent::AllowDecreasingSanity()
+{
+	bCanDecreaseSanity = true;
+	UE_LOGFMT(LogSanity, Display, "Sanity allowed to decrease");
+}
+
+void USanityComponent::ProhibitDecreasingSanityAndReset()
+{
+	bCanDecreaseSanity = false;
+	SetSanity(1.f);
+	UE_LOGFMT(LogSanity, Display, "Sanity prohibited from decreasing and reset");
 }
 
 void USanityComponent::UpdateSanity(float DeltaTime)
 {
+	if (!bCanDecreaseSanity) return;
 	if (bDecreaseSanity)
 	{
 		SetSanity(Sanity - DeltaTime * SanityDecreaseRate);

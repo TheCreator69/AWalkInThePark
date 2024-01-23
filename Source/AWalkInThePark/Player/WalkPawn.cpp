@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "SplineMovementComponent.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/AudioComponent.h"
 #include "../Interaction/InteractionComponent.h"
 #include "../Interaction/InteractiveActor.h"
@@ -26,6 +27,9 @@ AWalkPawn::AWalkPawn()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComponent->SetupAttachment(DefaultSceneRoot);
 
+	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule"));
+	CapsuleComponent->SetupAttachment(DefaultSceneRoot);
+
 	MusicPlayerComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("MusicPlayer"));
 	MusicPlayerComponent->SetupAttachment(DefaultSceneRoot);
 
@@ -43,7 +47,7 @@ void AWalkPawn::BeginPlay()
 	Super::BeginPlay();
 
 	MusicPlayerComponent->SetPaused(true);
-	SanityComponent->OnSanityReachedZero.AddDynamic(this, &AWalkPawn::KillPlayer);
+	SanityComponent->OnSanityReachedZero.AddUniqueDynamic(this, &AWalkPawn::KillPlayer);
 }
 
 // Called every frame

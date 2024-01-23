@@ -13,8 +13,11 @@ class USplineMovementComponent;
 class UCameraComponent;
 class UInteractionComponent;
 class USanityComponent;
+class UCapsuleComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMusicPlayStateChanged, bool, bIsPaused);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartOverlapSafeZone);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEndOverlapSafeZone);
 
 // Default pawn implementing spline-based movement and other essential player functionality
 UCLASS()
@@ -33,6 +36,10 @@ public:
 	// Camera used as view target
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UCameraComponent> CameraComponent;
+
+	// Capsule component used for collision detection with triggers
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UCapsuleComponent> CapsuleComponent;
 
 	// Component responsible for moving player along a spline
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -97,6 +104,14 @@ public:
 	// Event dispatched when the music starts/stops playing
 	UPROPERTY(BlueprintAssignable, Category = "Music")
 	FMusicPlayStateChanged OnMusicStateChanged;
+
+	// Event dispatched when player starts overlapping a safe zone
+	UPROPERTY(BlueprintAssignable, Category = "Safe Zone")
+	FStartOverlapSafeZone OnBeginOverlapSafeZone;
+
+	// Event dispatched when player stops overlapping a safe zone
+	UPROPERTY(BlueprintAssignable, Category = "Safe Zone")
+	FEndOverlapSafeZone OnEndOverlapSafeZone;
 
 private:
 	// Is the current music being played the track that masks the water monster?

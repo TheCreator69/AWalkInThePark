@@ -56,7 +56,7 @@ public:
 	void SetSanity(float NewSanity);
 
 	// Activate/deactivate decreasing sanity. If deactivated, sanity will increase instead
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = "Sanity")
 	void SetDecreaseSanity(bool bNewDecreaseSanity);
 
 	// Event dispatched when sanity reaches zero
@@ -66,10 +66,23 @@ public:
 private:
 	float Sanity = 1.f;
 
-	// Should this component decrease the sanity at a regular interval?
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
-	bool bDecreaseSanity = false;
+	// Should sanity currently be decreased? Has no effect is bCanDecreaseSanity is set to false
+	bool bDecreaseSanity = true;
 
+	// Can sanity currently be decreased? False if player is in safe zone, for instance.
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	bool bCanDecreaseSanity = false;
+
+protected:
+	// Allow sanity to decrease
+	UFUNCTION(BlueprintCallable)
+	void AllowDecreasingSanity();
+
+	// Prohibit sanity from decreasing and restore sanity
+	UFUNCTION(BlueprintCallable)
+	void ProhibitDecreasingSanityAndReset();
+
+private:
 	// Increase/decrease sanity. Used in tick function
 	void UpdateSanity(float DeltaTime);
 
@@ -85,5 +98,6 @@ private:
 	// Timer handle used to play looping intrusive thoughts at low sanity.
 	FTimerHandle IntrusiveThoughtTimerHandle;
 
+	// Play intrusive thought audio with volume multiplier relative to insanity
 	void PlayIntrusiveThought();
 };
