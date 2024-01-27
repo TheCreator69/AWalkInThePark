@@ -34,6 +34,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera", meta = (UIMin = 0.f, ClampMin = 0.f, UIMax = 180.f, ClampMax = 360.f))
 	float MaxYawOffset = 120.f;
 
+	// I am a bit stupid, so this is a hack variable to let the component know it's supposed to respect the player's location and rotation offset while sitting.
+	bool bSitMode = false;
+
+	// To let the component know which way is forward while the player is sitting
+	FRotator SitModeBaseOffset;
+
 private:
 	// Current movement speed, duh
 	float CurrentSpeed = 0.f;
@@ -68,8 +74,8 @@ public:
 	*/ 
 	void AddToMovementSpeed(float SpeedOffsetPerSecond);
 
-	// Reset player movement speed, stopping them
-	void StopPlayerMovement();
+	// Reset movement speed, stopping owner
+	void StopMovement();
 
 	// Add a rotation offset to the player's camera. The yaw and pitch are capped based on the values provided to this component
 	UFUNCTION(BlueprintCallable)

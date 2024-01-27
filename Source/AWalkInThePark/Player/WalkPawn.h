@@ -15,6 +15,7 @@ class UInteractionComponent;
 class USanityComponent;
 class UCapsuleComponent;
 class AParkBench;
+class USittingComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMusicPlayStateChanged, bool, bIsPaused);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartOverlapSafeZone);
@@ -25,14 +26,6 @@ enum PlayerDeathReason
 {
 	Insanity UMETA(DisplayName = "Insanity"),
 	Monster UMETA(DisplayName = "Monster"),
-};
-
-UENUM(BlueprintType)
-enum SitStatus
-{
-	ForcedSitting UMETA(DisplayName = "Forced To Sit"),
-	Sitting UMETA(DisplayName = "Sitting"),
-	Standing UMETA(DisplayName = "Standing"),
 };
 
 // Default pawn implementing spline-based movement and other essential player functionality
@@ -76,6 +69,10 @@ public:
 	// Component used to manage sanity and sanity-related effects
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<USanityComponent> SanityComponent;
+
+	// Component used to manage gameplay changes when sitting down and standing up
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<USittingComponent> SittingComponent;
 	
 	// Music track used to mask the water monster's sounds
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
@@ -89,9 +86,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Intrusive Thoughts")
 	TObjectPtr<USoundBase> IntrusiveThoughtSoundEffect;
 
-	// The mapping context used to define input actions
+	// The mapping context used to define input actions that should always be available
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
-	TObjectPtr<UInputMappingContext> MappingContext;
+	TObjectPtr<UInputMappingContext> GlobalMappingContext;
 	
 	// Input action used for acceleration/deceleration
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
@@ -117,6 +114,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputAction> TogglePauseAction;
 
+	// Input action used for standing up from a park bench
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<UInputAction> GetUpAction;
+
+	// Input action used for saving the game
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<UInputAction> SaveGameAction;
+
 	// Event dispatched when the music starts/stops playing
 	UPROPERTY(BlueprintAssignable, Category = "Music")
 	FMusicPlayStateChanged OnMusicStateChanged;
@@ -128,13 +133,6 @@ public:
 	// Event dispatched when player stops overlapping a safe zone
 	UPROPERTY(BlueprintAssignable, Category = "Safe Zone")
 	FEndOverlapSafeZone OnEndOverlapSafeZone;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Park Bench")
-	TObjectPtr<AParkBench> ParkBenchSatOn;
-
-	// Is the player currently sitting on a park bench?
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Park Bench")
-	TEnumAsByte<SitStatus> SitStatus = Standing;
 
 private:
 	// Is the current music being played the track that masks the water monster?
@@ -179,5 +177,13 @@ private:
 	// Pause/Unpause the game
 	UFUNCTION()
 	void TogglePause(const FInputActionValue& Value);
+
+	// Get up from a park bench
+	UFUNCTION()
+	void GetUp(const FInputActionValue& Value);
+
+	// Save the game
+	UFUNCTION()
+	void SaveGame(const FInputActionValue& Value);
 
 };

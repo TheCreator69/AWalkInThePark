@@ -39,7 +39,10 @@ void UInteractionComponent::TraceForInteractiveActor()
 	GetWorld()->LineTraceSingleByChannel(OutHit, Start, End, ECC_Visibility);
 	if (OutHit.bBlockingHit && OutHit.GetActor()->Implements<UInteractiveActor>())
 	{
-		TargetedActor = OutHit.GetActor();
+		AActor* HitActor = OutHit.GetActor();
+		if (!IInteractiveActor::Execute_IsInteractive(HitActor)) return;
+
+		TargetedActor = HitActor;
 		UE_LOGFMT(LogInteraction, Verbose, "Interactive actor being targeted: {0}", TargetedActor->GetName());
 	}
 	else

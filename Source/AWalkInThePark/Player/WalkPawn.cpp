@@ -15,6 +15,7 @@
 #include "SanityComponent.h"
 #include "../Core/WalkDefines.h"
 #include "../Environment/ParkBench.h"
+#include "SittingComponent.h"
 
 // Sets default values
 AWalkPawn::AWalkPawn()
@@ -40,6 +41,7 @@ AWalkPawn::AWalkPawn()
 	SplineMovementComponent = CreateDefaultSubobject<USplineMovementComponent>(TEXT("SplineMovementComponent"));
 	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("InteractionComponent"));
 	SanityComponent = CreateDefaultSubobject<USanityComponent>(TEXT("SanityComponent"));
+	SittingComponent = CreateDefaultSubobject<USittingComponent>(TEXT("SittingComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -65,7 +67,7 @@ void AWalkPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
 
 	Subsystem->ClearAllMappings();
-	Subsystem->AddMappingContext(MappingContext, 0);
+	Subsystem->AddMappingContext(GlobalMappingContext, 0);
 
 	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	Input->BindAction(ChangeSpeedAction, ETriggerEvent::Triggered, this, &AWalkPawn::ChangeSpeed);
@@ -74,6 +76,8 @@ void AWalkPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Input->BindAction(ChangeSongAction, ETriggerEvent::Triggered, this, &AWalkPawn::ChangeSong);
 	Input->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AWalkPawn::Interact);
 	Input->BindAction(TogglePauseAction, ETriggerEvent::Triggered, this, &AWalkPawn::TogglePause);
+	Input->BindAction(GetUpAction, ETriggerEvent::Triggered, this, &AWalkPawn::GetUp);
+	Input->BindAction(SaveGameAction, ETriggerEvent::Triggered, this, &AWalkPawn::SaveGame);
 }
 
 void AWalkPawn::KillPlayer(TEnumAsByte<PlayerDeathReason> Reason)
@@ -85,18 +89,9 @@ void AWalkPawn::ChangeSpeed(const FInputActionValue& Value)
 {
 	float ActionValue = Value.Get<float>();
 	bool bSlowDown = ActionValue <= 0.f;
+	SplineMovementComponent->AddToMovementSpeed((bSlowDown ? 120.f : 30.f) * ActionValue);
 
-	// Special case, for getting up by pressing forward key/moving joystick forward
-	// TODO: Move this to its own function and change the input mapping context when player is sitting down?
-	if (SitStatus == Sitting && !bSlowDown && ParkBenchSatOn)
-	{
-		ParkBenchSatOn->GetUp();
-	}
-	else
-	{
-		SplineMovementComponent->AddToMovementSpeed((bSlowDown ? 120.f : 30.f) * ActionValue);
-		UE_LOGFMT(LogWalkPlayer, Verbose, "Speed change input triggered with ActionValue: {0}", ActionValue);
-	}
+	UE_LOGFMT(LogWalkPlayer, Verbose, "Speed change input triggered with ActionValue: {0}", ActionValue);
 }
 
 void AWalkPawn::Look(const FInputActionValue& Value)
@@ -140,5 +135,18 @@ void AWalkPawn::TogglePause(const FInputActionValue& Value)
 	UGameplayStatics::SetGamePaused(GetWorld(), !UGameplayStatics::IsGamePaused(GetWorld()));
 
 	UE_LOGFMT(LogWalkPlayer, Verbose, "Pause input triggered");
+}
+
+void AWalkPawn::GetUp(const FInputActionValue& Value)
+{
+	if (!SittingComponent->CanPlayerGetUp()) return;
+	SittingComponent->OnPlayerGetUp();
+
+	UE_LOGFMT(LogWalkPlayer, Display, "Get up input triggered");
+}
+
+void AWalkPawn::SaveGame(const FInputActionValue& Value)
+{
+	UE_LOGFMT(LogWalkPlayer, Display, "Save game input triggered");
 }
 

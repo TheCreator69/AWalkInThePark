@@ -9,9 +9,7 @@
 
 class UCameraComponent;
 class AWalkPawn;
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerSatDown);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerGotUp);
+class AWalkPath;
 
 // The park benches the player uses to rest and save their progress on. Also serve as instigators for new monster introductions
 UCLASS()
@@ -35,42 +33,38 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UCameraComponent> CameraComponent;
 
-	// Event dispatched when the player sits down
-	UPROPERTY(BlueprintAssignable, Category = "Sitting")
-	FPlayerSatDown OnPlayerSitDown;
-
-	// Event dispatched when the player stands up
-	UPROPERTY(BlueprintAssignable, Category = "Sitting")
-	FPlayerGotUp OnPlayerStandUp;
-
-	// How long the player is forced to sit down. Remove once sit event system is properly implemented.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sitting")
-	double ForcedSitTime = 0.0;
+	// The walk path player should take after getting back up
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Sitting")
+	TObjectPtr<AWalkPath> NextPath;
 
 private:
-	// Whether the player can sit on this bench or not
-	bool bCanPlayerSit = false;
+	// Whether the player can sit on this bench or not.
+	// Will be false if the player has sat down on this bench or is currently sitting.
+	bool bCanPlayerSit = true;
 
-	// Reference to player
 	TObjectPtr<AWalkPawn> Player;
-
-	// Timer handle to end forced sitting
-	FTimerHandle ForcedSitEndTimer;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	// Allow the player to get up again. Usually called after a scripted sitting event has finished
+	UFUNCTION(BlueprintCallable, Category = "Sitting")
+	void AllowPlayerToGetUp();
+
 public:
-	// C++ implementation of Interact() from IInteractiveActor
+	// Event dispatched when the player sits down (used for blueprint scripting)
+	UFUNCTION(BlueprintImplementableEvent, Category = "Sitting", meta = (DisplayName = "PlayerSitDown"))
+	void K2_OnPlayerSitDown();
+
+	// Event dispatched when the player stands up (used for blueprint scripting)
+	UFUNCTION(BlueprintImplementableEvent, Category = "Sitting", meta = (DisplayName = "PlayerGetUp"))
+	void K2_OnPlayerGetUp();
+
+	// Used to sit the player down on the park bench
 	void Interact_Implementation(AActor* Source);
 
-private:
-	// Allow player to get up again
-	void AllowPlayerToStand();
-
-public:
-	// Function called by Player pawn when it gets up
+	// Function called by Player pawn's sitting component when player gets up
 	void GetUp();
 
 	// C++ implementation of GetInteractionPrompt() from IInteractiveActor

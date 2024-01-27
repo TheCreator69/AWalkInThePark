@@ -6,7 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "../Core/WalkDefines.h"
 #include "Kismet/GameplayStatics.h"
-#include "../Player/SplineMovementComponent.h"
+#include "../Player/SittingComponent.h"
 
 // Sets default values
 AParkBench::AParkBench()
@@ -22,8 +22,6 @@ AParkBench::AParkBench()
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("ViewTarget"));
 	CameraComponent->SetupAttachment(DefaultSceneRoot);
-	
-	bFindCameraComponentWhenViewTarget = true;
 }
 
 // Called when the game starts or when spawned
@@ -32,51 +30,33 @@ void AParkBench::BeginPlay()
 	Super::BeginPlay();
 
 	Player = Cast<AWalkPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
-	if (!Player) return;
+}
+
+void AParkBench::AllowPlayerToGetUp()
+{
+	Player->SittingComponent->AllowPlayerToGetUp();
+
+	UE_LOGFMT(LogBench, Display, "Played allowed to get back up again");
 }
 
 void AParkBench::Interact_Implementation(AActor* Source)
 {
 	if (!Player || Source != Player) return;
 
-	// Stop the player dead in their tracks for now. Later on, change tracks
-	// (splines, but then the word play wouldn't work anymore)
-	Player->SplineMovementComponent->StopPlayerMovement();
-	Player->ParkBenchSatOn = this;
+	Player->SittingComponent->OnPlayerSitDown(this);
 	bCanPlayerSit = false;
 
-	if (ForcedSitTime <= 0.0)
-	{
-		Player->SitStatus = Sitting;
-	}
-	else
-	{
-		Player->SitStatus = ForcedSitting;
-		GetWorld()->GetTimerManager().SetTimer(ForcedSitEndTimer, this, &AParkBench::AllowPlayerToStand, ForcedSitTime);
-	}
+	Player->SetActorLocation(CameraComponent->GetComponentLocation() - FVector(0.0, 0.0, 64.0));
+	Player->Controller->SetControlRotation(CameraComponent->GetComponentRotation());
 
-	UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetViewTargetWithBlend(this);
+	K2_OnPlayerSitDown();
 
-	OnPlayerSitDown.Broadcast();
-
-	UE_LOGFMT(LogBench, Display, "Player sat down on Park Bench with forced sitting time of: {0}", ForcedSitTime);
-}
-
-void AParkBench::AllowPlayerToStand()
-{
-	Player->SitStatus = Sitting;
-
-	UE_LOGFMT(LogBench, Display, "Player is allowed to stand up again");
+	UE_LOGFMT(LogBench, Display, "Player sat down on Park Bench");
 }
 
 void AParkBench::GetUp()
 {
-	Player->SitStatus = Standing;
-	Player->ParkBenchSatOn = nullptr;
-
-	UGameplayStatics::GetPlayerController(GetWorld(), 0)->SetViewTargetWithBlend(Player);
-
-	OnPlayerStandUp.Broadcast();
+	K2_OnPlayerGetUp();
 
 	UE_LOGFMT(LogBench, Display, "Player got up from Park Bench");
 }

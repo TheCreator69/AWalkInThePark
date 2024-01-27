@@ -26,10 +26,19 @@ void USplineMovementComponent::SetOwnerTransformAlongSpline() const
 {
 	APawn* Owner = Cast<APawn>(GetOwner());
 	if (!Owner) return;
-
-	FTransform SplineTransform = CurrentPath->Spline->GetTransformAtDistanceAlongSpline(DistanceAlongSpline, ESplineCoordinateSpace::World);
-	Owner->SetActorLocation(SplineTransform.GetLocation());
-	Owner->GetController()->SetControlRotation(SplineTransform.Rotator() + CameraRotationOffset);
+	
+	// Fuck this.
+	if (bSitMode)
+	{
+		Owner->GetController()->SetControlRotation(SitModeBaseOffset + CameraRotationOffset);
+	}
+	else
+	{
+		FTransform SplineTransform = CurrentPath->Spline->GetTransformAtDistanceAlongSpline(DistanceAlongSpline, ESplineCoordinateSpace::World);
+		Owner->SetActorLocation(SplineTransform.GetLocation());
+		Owner->GetController()->SetControlRotation(SplineTransform.Rotator() + CameraRotationOffset);
+	}
+	
 }
 
 // Called when the game starts
@@ -55,7 +64,7 @@ void USplineMovementComponent::AddToMovementSpeed(float SpeedOffsetPerSecond)
 	UE_LOGFMT(LogSplineMovement, Verbose, "Movement speed changed by offset: {0}", SpeedOffsetThisTick);
 }
 
-void USplineMovementComponent::StopPlayerMovement()
+void USplineMovementComponent::StopMovement()
 {
 	CurrentSpeed = 0.f;
 }
