@@ -7,6 +7,7 @@
 #include "SplineMovementComponent.generated.h"
 
 class AWalkPath;
+class UCameraShakeBase;
 
 // Component the moves its owner along a spline path. This involves updating owner's location and rotation to match the spline's
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -22,6 +23,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	TObjectPtr<AWalkPath> CurrentPath;
 
+	// Camera shake used while player is standing still.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+	TSubclassOf<UCameraShakeBase> IdleCameraShake;
+
+	// Camera shake used while player is walking slowly.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+	TSubclassOf<UCameraShakeBase> SlowWalkCameraShake;
+
+	// Camera shake used while player is walking quickly.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+	TSubclassOf<UCameraShakeBase> FastWalkCameraShake;
+
 	// Maximum speed the owner can reach
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	float MaxSpeed = 125.f;
@@ -34,11 +47,27 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera", meta = (UIMin = 0.f, ClampMin = 0.f, UIMax = 180.f, ClampMax = 360.f))
 	float MaxYawOffset = 120.f;
 
+	// Max overshoot allowed for camera pitch. The camera will allow this additional pitch but correct itself to MaxPitchOffset over time if left alone.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+	float MaxPitchOvershoot = 5.f;
+
+	// Max overshoot allowed for camera yaw. The camera will allow this additional yaw but correct itself to MaxYawOffset over time if left alone.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+	float MaxYawOvershoot = 10.f;
+
 	// I am a bit stupid, so this is a hack variable to let the component know it's supposed to respect the player's location and rotation offset while sitting.
 	bool bSitMode = false;
 
 	// To let the component know which way is forward while the player is sitting
 	FRotator SitModeBaseOffset;
+
+	// Speed at which the camera rotation is supposed to be interpolated to the target rotation offset.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+	float RotationOffsetInterpSpeed = 20.f;
+
+	// Speed at which camera overshoot should be corrected.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+	float OvershootCorrectionInterpSpeed = 3.f;
 
 private:
 	// Current movement speed, duh
@@ -53,11 +82,20 @@ private:
 	// Set owner's transform based on its distance along the spline
 	void SetOwnerTransformAlongSpline() const;
 
+	// Stop owner when they reach the end of the current spline.
+	void StopOwnerWhenEndReached();
+
+	// Play the appropriate camera shake based on owner's speed. Used for player only.
+	void PlayAppropriateCameraShake();
+
 	/*
 	* How much the camera's rotation should differ from the spline's at owner's current location.
-	* Used for turning the camera while walking.
+	* Used for turning the camera while walking. This is the target location this component intends to reach.
 	*/
-	FRotator CameraRotationOffset = FRotator(0.f, 0.f, 0.f);
+	FRotator CameraRotationOffset = FRotator(0.0, 0.0, 0.0);
+
+	// Correct camera overshoot for both pitch and yaw over time, if present.
+	void CorrectCameraOvershoot();
 
 protected:
 	// Called when the game starts

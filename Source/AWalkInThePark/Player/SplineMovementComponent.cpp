@@ -7,6 +7,7 @@
 #include "Components/SplineComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "../Core/WalkDefines.h"
+#include "Camera/CameraShakeBase.h"
 
 // Sets default values for this component's properties
 USplineMovementComponent::USplineMovementComponent()
@@ -19,6 +20,8 @@ USplineMovementComponent::USplineMovementComponent()
 void USplineMovementComponent::UpdateDistanceAlongSpline(float DeltaTime)
 {
 	DistanceAlongSpline += DeltaTime * CurrentSpeed;
+	DistanceAlongSpline = FMath::Clamp(DistanceAlongSpline, 0, CurrentPath->Spline->GetSplineLength());
+
 	UE_LOGFMT(LogSplineMovement, Verbose, "Distance along spline updated: {0}", DistanceAlongSpline);
 }
 
@@ -30,15 +33,84 @@ void USplineMovementComponent::SetOwnerTransformAlongSpline() const
 	// Fuck this.
 	if (bSitMode)
 	{
-		Owner->GetController()->SetControlRotation(SitModeBaseOffset + CameraRotationOffset);
+		const FRotator InterpCameraRotationOffset = FMath::RInterpTo(
+			Owner->GetControlRotation(), 
+			SitModeBaseOffset + CameraRotationOffset, 
+			GetWorld()->GetDeltaSeconds(), 
+			RotationOffsetInterpSpeed
+		);
+
+		Owner->GetController()->SetControlRotation(InterpCameraRotationOffset);
 	}
 	else
 	{
 		FTransform SplineTransform = CurrentPath->Spline->GetTransformAtDistanceAlongSpline(DistanceAlongSpline, ESplineCoordinateSpace::World);
 		Owner->SetActorLocation(SplineTransform.GetLocation());
-		Owner->GetController()->SetControlRotation(SplineTransform.Rotator() + CameraRotationOffset);
+
+		const FRotator InterpCameraRotationOffset = FMath::RInterpTo(
+			Owner->GetControlRotation(), 
+			SplineTransform.Rotator() + CameraRotationOffset, 
+			GetWorld()->GetDeltaSeconds(), 
+			RotationOffsetInterpSpeed
+		);
+
+		Owner->GetController()->SetControlRotation(InterpCameraRotationOffset);
+	}
+}
+
+void USplineMovementComponent::StopOwnerWhenEndReached()
+{
+	float SplineTraversalPercentage = DistanceAlongSpline / CurrentPath->Spline->GetSplineLength();
+	if (SplineTraversalPercentage >= 1.f)
+	{
+		CurrentSpeed = 0.f;
+		UE_LOGFMT(LogSplineMovement, Display, "Owner reached end of spline");
+	}
+}
+
+void USplineMovementComponent::PlayAppropriateCameraShake()
+{
+	APawn* Owner = Cast<APawn>(GetOwner());
+	if (!Owner) return;
+
+	float SpeedPercentage = GetPlayerSpeedPercentage();
+	TSubclassOf<UCameraShakeBase> ChosenCameraShake;
+	if (SpeedPercentage > 0.5f)
+	{
+		ChosenCameraShake = FastWalkCameraShake;
+	}
+	else if (SpeedPercentage > 0.f)
+	{
+		ChosenCameraShake = SlowWalkCameraShake;
+	}
+	else
+	{
+		ChosenCameraShake = IdleCameraShake;
 	}
 	
+	if (ChosenCameraShake->IsChildOf<UCameraShakeBase>())
+	{
+		UGameplayStatics::PlayWorldCameraShake(GetWorld(), ChosenCameraShake, Owner->GetActorLocation(), 0.f, 100.f);
+	}
+}
+
+void USplineMovementComponent::CorrectCameraOvershoot()
+{
+	double CurrentPitch = CameraRotationOffset.Pitch;
+	if (FMath::Abs<double>(CurrentPitch) - MaxPitchOffset > 0)
+	{
+		double TargetPitch = MaxPitchOffset * FMath::Sign<double>(CurrentPitch);
+		double CorrectedPitch = FMath::FInterpTo<double>(CurrentPitch, TargetPitch, GetWorld()->GetDeltaSeconds(), OvershootCorrectionInterpSpeed);
+		CameraRotationOffset.Pitch = CorrectedPitch;
+	}
+
+	double CurrentYaw = CameraRotationOffset.Yaw;
+	if (FMath::Abs<double>(CurrentYaw) - MaxYawOffset > 0)
+	{
+		double TargetYaw = MaxYawOffset * FMath::Sign<double>(CurrentYaw);
+		double CorrectedYaw = FMath::FInterpTo<double>(CurrentYaw, TargetYaw, GetWorld()->GetDeltaSeconds(), OvershootCorrectionInterpSpeed);
+		CameraRotationOffset.Yaw = CorrectedYaw;
+	}
 }
 
 // Called when the game starts
@@ -54,6 +126,10 @@ void USplineMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 
 	UpdateDistanceAlongSpline(DeltaTime);
 	SetOwnerTransformAlongSpline();
+	StopOwnerWhenEndReached();
+
+	CorrectCameraOvershoot();
+	PlayAppropriateCameraShake();
 }
 
 void USplineMovementComponent::AddToMovementSpeed(float SpeedOffsetPerSecond)
@@ -82,8 +158,8 @@ FRotator USplineMovementComponent::GetCameraRotationOffset() const
 void USplineMovementComponent::SetCameraRotationOffset(FRotator NewOffset)
 {
 	CameraRotationOffset = NewOffset;
-	CameraRotationOffset.Pitch = FMath::Clamp(CameraRotationOffset.Pitch, -MaxPitchOffset, MaxPitchOffset);
-	CameraRotationOffset.Yaw = FMath::Clamp(CameraRotationOffset.Yaw, -MaxYawOffset, MaxYawOffset);
+	CameraRotationOffset.Pitch = FMath::Clamp(CameraRotationOffset.Pitch, -(MaxPitchOffset + MaxPitchOvershoot), MaxPitchOffset + MaxPitchOvershoot);
+	CameraRotationOffset.Yaw = FMath::Clamp(CameraRotationOffset.Yaw, -(MaxYawOffset + MaxYawOvershoot), MaxYawOffset + MaxYawOvershoot);
 
 	UE_LOGFMT(LogSplineMovement, Verbose, "Camera rotation offset set: {0}", CameraRotationOffset.ToCompactString());
 }
