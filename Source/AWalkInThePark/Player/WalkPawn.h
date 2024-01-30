@@ -110,10 +110,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputAction> InteractAction;
 
-	// Input action used for pausing/unpausing
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
-	TObjectPtr<UInputAction> TogglePauseAction;
-
 	// Input action used for standing up from a park bench
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputAction> GetUpAction;
@@ -173,10 +169,6 @@ private:
 	// Interact with objects in the world (primarily used for sitting down/getting up)
 	UFUNCTION()
 	void Interact(const FInputActionValue& Value);
-
-	// Pause/Unpause the game
-	UFUNCTION()
-	void TogglePause(const FInputActionValue& Value);
 
 	// Get up from a park bench
 	UFUNCTION()

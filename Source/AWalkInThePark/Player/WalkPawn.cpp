@@ -75,7 +75,6 @@ void AWalkPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Input->BindAction(ToggleMusicAction, ETriggerEvent::Triggered, this, &AWalkPawn::ToggleMusic);
 	Input->BindAction(ChangeSongAction, ETriggerEvent::Triggered, this, &AWalkPawn::ChangeSong);
 	Input->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AWalkPawn::Interact);
-	Input->BindAction(TogglePauseAction, ETriggerEvent::Triggered, this, &AWalkPawn::TogglePause);
 	Input->BindAction(GetUpAction, ETriggerEvent::Triggered, this, &AWalkPawn::GetUp);
 	Input->BindAction(SaveGameAction, ETriggerEvent::Triggered, this, &AWalkPawn::SaveGame);
 }
@@ -128,13 +127,6 @@ void AWalkPawn::Interact(const FInputActionValue& Value)
 	IInteractiveActor::Execute_Interact(InteractionActor, this);
 
 	UE_LOGFMT(LogWalkPlayer, Verbose, "Interaction input triggered");
-}
-
-void AWalkPawn::TogglePause(const FInputActionValue& Value)
-{
-	UGameplayStatics::SetGamePaused(GetWorld(), !UGameplayStatics::IsGamePaused(GetWorld()));
-
-	UE_LOGFMT(LogWalkPlayer, Verbose, "Pause input triggered");
 }
 
 void AWalkPawn::GetUp(const FInputActionValue& Value)
