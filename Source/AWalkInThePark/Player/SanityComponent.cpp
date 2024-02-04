@@ -34,7 +34,7 @@ void USanityComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
-	GetWorld()->GetTimerManager().ClearTimer(IntrusiveThoughtTimerHandle);
+	GetWorld()->GetTimerManager().ClearTimer(ThoughtTimerHandle);
 }
 
 void USanityComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -111,16 +111,17 @@ void USanityComponent::UpdateSanityEffects()
 	Owner->CameraComponent->PostProcessSettings.bOverride_ColorGammaMidtones = true;
 	Owner->CameraComponent->PostProcessSettings.ColorGammaMidtones = PostProcessLerp(1, 0.8, SanityAlpha);
 
-	if (Sanity > 0.2)
+	if (Sanity > 0.2 && CurrentThoughtState)
 	{
-		GetWorld()->GetTimerManager().ClearTimer(IntrusiveThoughtTimerHandle);
+		StopIntrusiveThoughts();
 	}
-	else
+	else if(Sanity < 0.2 && !CurrentThoughtState)
 	{
-		// Don't schedule the intrusive thought timer if it's already counting down
-		if (GetWorld()->GetTimerManager().IsTimerActive(IntrusiveThoughtTimerHandle)) return;
-		GetWorld()->GetTimerManager().SetTimer(IntrusiveThoughtTimerHandle, this, &USanityComponent::PlayIntrusiveThought, 3.f, true, 1.f);
+		StartIntrusiveThoughts();
 	}
+
+	float VolumeMultiplier = (0.5f - Sanity) * 1.2f + 0.4f;
+	Owner->IntrusiveThoughtsComponent->SetVolumeMultiplier(VolumeMultiplier);
 }
 
 float USanityComponent::InvertedSanityAlpha(float Threshold) const
@@ -133,12 +134,87 @@ FVector4 USanityComponent::PostProcessLerp(double A, double B, float Alpha) cons
 	return FMath::Lerp<FVector4, float>(FVector4(A, A, A, 1), FVector4(B, B, B, 1), Alpha);
 }
 
-void USanityComponent::PlayIntrusiveThought()
+void USanityComponent::StartIntrusiveThoughts()
+{
+	TArray<FThoughtState*> Rows;
+	ThoughtStateMachine->GetAllRows<FThoughtState>(TEXT("Select state state"), Rows);
+	
+	TArray<FThoughtState*> StartStates = Rows.FilterByPredicate([&](const FThoughtState* Element)
+		{
+			return Element->bCanBeStartState; 
+		}
+	);
+
+	if (StartStates.Num() == 0) return;
+
+	int StartIndex = FMath::RandRange(0, StartStates.Num() - 1);
+	CurrentThoughtState = StartStates[StartIndex];
+
+	PlayIntrusiveThought();
+	ScheduleNextThought();
+
+	UE_LOGFMT(LogSanity, Display, "Started intrusive thoughts with sound: {0}", CurrentThoughtState->Sound->GetFName());
+}
+
+void USanityComponent::StopIntrusiveThoughts()
 {
 	AWalkPawn* Owner = Cast<AWalkPawn>(GetOwner());
-	float VolumeMultiplier = (0.5f - Sanity) * 1.2f + 0.4f;
-	UGameplayStatics::PlaySound2D(GetWorld(), Owner->IntrusiveThoughtSoundEffect, VolumeMultiplier);
 
-	UE_LOGFMT(LogSanity, Verbose, "Intrusive thought audio played with volume multiplier: {0}", VolumeMultiplier);
+	Owner->IntrusiveThoughtsComponent->Stop();
+	CurrentThoughtState = nullptr;
+	GetWorld()->GetTimerManager().ClearTimer(ThoughtTimerHandle);
+
+	UE_LOGFMT(LogSanity, Display, "Stopped intrusive thoughts");
+}
+
+void USanityComponent::SelectAndPlayNewThought()
+{
+	if (!CurrentThoughtState) return;
+
+	float TotalWeight = 0.f;
+	for (FThoughtTransition Transition : CurrentThoughtState->Transitions)
+	{
+		TotalWeight += Transition.ChanceWeight;
+	}
+
+	float RandomWeight = FMath::RandRange(0.f, TotalWeight);
+
+	float SummedWeight = 0.f;
+	for (FThoughtTransition Transition : CurrentThoughtState->Transitions)
+	{
+		SummedWeight += Transition.ChanceWeight;
+		if (SummedWeight >= RandomWeight)
+		{
+			CurrentThoughtState = ThoughtStateMachine->FindRow<FThoughtState>(Transition.TargetRowName, TEXT("USanityComponent::SelectAndPlayNewThought"));
+			if (!CurrentThoughtState) return;
+
+			break;
+		}
+	}
+
+	PlayIntrusiveThought();
+	ScheduleNextThought();
+}
+
+void USanityComponent::PlayIntrusiveThought()
+{
+	if (!CurrentThoughtState) return;
+
+	AWalkPawn* Owner = Cast<AWalkPawn>(GetOwner());
+
+	Owner->IntrusiveThoughtsComponent->SetSound(CurrentThoughtState->Sound);
+	Owner->IntrusiveThoughtsComponent->Play();
+
+	UE_LOGFMT(LogSanity, Display, "Play intrusive thought: {0}", CurrentThoughtState->Sound->GetFName());
+}
+
+void USanityComponent::ScheduleNextThought()
+{
+	if (!CurrentThoughtState) return;
+
+	float CurrentThoughtDuration = CurrentThoughtState->Sound->GetDuration();
+	GetWorld()->GetTimerManager().SetTimer(ThoughtTimerHandle, this, &USanityComponent::SelectAndPlayNewThought, CurrentThoughtDuration);
+
+	UE_LOGFMT(LogSanity, Display, "Schedule next intrusive thought with delay: {0}", CurrentThoughtDuration);
 }
 

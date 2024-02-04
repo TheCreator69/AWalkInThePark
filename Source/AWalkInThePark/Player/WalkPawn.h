@@ -62,6 +62,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UAudioComponent> LowSanityAmbienceComponent;
 
+	// Component used to play intrusive thoughts
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UAudioComponent> IntrusiveThoughtsComponent;
+
 	// Component used to interact with interactive actors (what a mouthful!)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UInteractionComponent> InteractionComponent;
@@ -81,10 +85,6 @@ public:
 	// Music track used to mask the park monster's sounds
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
 	TObjectPtr<USoundBase> MusicTrackParkMask;
-
-	// Sound effect used to play a random intrusive thought
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Intrusive Thoughts")
-	TObjectPtr<USoundBase> IntrusiveThoughtSoundEffect;
 
 	// The mapping context used to define input actions that should always be available
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")

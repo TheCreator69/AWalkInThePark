@@ -38,6 +38,9 @@ AWalkPawn::AWalkPawn()
 	LowSanityAmbienceComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("LowSanityAmbience"));
 	LowSanityAmbienceComponent->SetupAttachment(DefaultSceneRoot);
 
+	IntrusiveThoughtsComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("IntrusiveThoughts"));
+	IntrusiveThoughtsComponent->SetupAttachment(DefaultSceneRoot);
+
 	SplineMovementComponent = CreateDefaultSubobject<USplineMovementComponent>(TEXT("SplineMovementComponent"));
 	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("InteractionComponent"));
 	SanityComponent = CreateDefaultSubobject<USanityComponent>(TEXT("SanityComponent"));
@@ -81,7 +84,7 @@ void AWalkPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AWalkPawn::KillPlayer(TEnumAsByte<PlayerDeathReason> Reason)
 {
-	UE_LOGFMT(LogWalkPlayer, Display, "Player is dead with reason: {0}", Reason.GetValue());
+	UE_LOGFMT(LogWalkPlayer, Verbose, "Player is dead with reason: {0}", Reason.GetValue());
 }
 
 void AWalkPawn::ChangeSpeed(const FInputActionValue& Value)
