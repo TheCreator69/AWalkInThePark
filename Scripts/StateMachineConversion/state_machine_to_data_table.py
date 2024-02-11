@@ -53,13 +53,25 @@ for link in links:
         node_index = int(link["node"])
         node = nodes[node_index]
 
-        new_transition = Transition(node["text"], link["text"])
+        chance_weight = 1.0
+        try:
+            chance_weight = float(link["text"])
+        except ValueError:
+            chance_weight = 1.0
+
+        new_transition = Transition(node["text"], chance_weight)
         states[node_index].add_transition(new_transition)
     elif(link["type"] == "Link"):
         target_node_index = int(link["nodeB"])
         target_node = nodes[target_node_index]
 
-        new_transition = Transition(target_node["text"], link["text"])
+        chance_weight = 1.0
+        try:
+            chance_weight = float(link["text"])
+        except ValueError:
+            chance_weight = 1.0
+
+        new_transition = Transition(target_node["text"], chance_weight)
 
         start_node_index = int(link["nodeA"])
         states[start_node_index].add_transition(new_transition)
