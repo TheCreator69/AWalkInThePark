@@ -121,7 +121,7 @@ while True:
     ]
     answers = inquirer.prompt(new_state_questions)
     
-    new_state = State(answers["row_name"], answers["is_start_state"], "None", answers["example_voiceline"])
+    new_state = State(answers["row_name"], answers["is_start_state"], answers["example_voiceline"])
     states.append(new_state)
     print(Fore.GREEN + f"Added new state {new_state.row_name} with example voiceline '{new_state.example_voiceline}'." + Style.RESET_ALL)
 
