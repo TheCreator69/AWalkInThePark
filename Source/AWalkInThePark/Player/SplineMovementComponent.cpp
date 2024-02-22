@@ -28,7 +28,11 @@ void USplineMovementComponent::UpdateDistanceAlongSpline(float DeltaTime)
 void USplineMovementComponent::SetOwnerTransformAlongSpline() const
 {
 	APawn* Owner = Cast<APawn>(GetOwner());
-	if (!Owner) return;
+	if (!Owner)
+	{
+		UE_LOGFMT(LogSplineMovement, Warning, "{0} added to actor which doesn't descend from Pawn!", GetOwner()->GetFName());
+		return;
+	}
 	
 	// Fuck this.
 	if (bSitMode)
@@ -124,9 +128,12 @@ void USplineMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	UpdateDistanceAlongSpline(DeltaTime);
-	SetOwnerTransformAlongSpline();
-	StopOwnerWhenEndReached();
+	if (CurrentPath)
+	{
+		UpdateDistanceAlongSpline(DeltaTime);
+		SetOwnerTransformAlongSpline();
+		StopOwnerWhenEndReached();
+	}
 
 	CorrectCameraOvershoot();
 	PlayAppropriateCameraShake();
