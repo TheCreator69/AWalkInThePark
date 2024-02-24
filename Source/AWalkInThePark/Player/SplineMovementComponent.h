@@ -101,9 +101,15 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	/*
+	* Change the walk path to the specified one and position owner at the start.
+	* Doesn't check whether or not the current walk path is the same as the newly specified one.
+	*/
+	void ChangePath(AWalkPath* NewPath);
 
 	/*
 	* Add the specified amount to the current movement speed.

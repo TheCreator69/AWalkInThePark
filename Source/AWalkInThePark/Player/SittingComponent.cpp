@@ -61,7 +61,7 @@ void USittingComponent::OnPlayerGetUp()
 	AWalkPath* PotentialNextPath = CurrentBench->NextPath;
 	if (PotentialNextPath && PotentialNextPath != Player->SplineMovementComponent->CurrentPath)
 	{
-		Player->SplineMovementComponent->CurrentPath = PotentialNextPath;
+		Player->SplineMovementComponent->ChangePath(PotentialNextPath);
 	}
 	// Ugly hack part #2
 	Player->SplineMovementComponent->bSitMode = false;

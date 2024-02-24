@@ -139,6 +139,12 @@ void USplineMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 	PlayAppropriateCameraShake();
 }
 
+void USplineMovementComponent::ChangePath(AWalkPath* NewPath)
+{
+	CurrentPath = NewPath;
+	DistanceAlongSpline = 0.f;
+}
+
 void USplineMovementComponent::AddToMovementSpeed(float SpeedOffsetPerSecond)
 {
 	float SpeedOffsetThisTick = SpeedOffsetPerSecond * UGameplayStatics::GetWorldDeltaSeconds(GetWorld());
