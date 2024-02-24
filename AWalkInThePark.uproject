@@ -489,6 +489,10 @@
 		{
 			"Name": "AutomationUtils",
 			"Enabled": false
+		},
+		{
+			"Name": "Water",
+			"Enabled": true
 		}
 	],
 	"TargetPlatforms": [
