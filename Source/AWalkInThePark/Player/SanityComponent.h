@@ -121,6 +121,10 @@ private:
 	bool bCanDecreaseSanity = false;
 
 protected:
+	// Set sanity right above the threshold where sanity effects kick in
+	UFUNCTION(BlueprintCallable)
+	void TriggerEffectsImmediately();
+
 	// Allow sanity to decrease
 	UFUNCTION(BlueprintCallable)
 	void AllowDecreasingSanity();

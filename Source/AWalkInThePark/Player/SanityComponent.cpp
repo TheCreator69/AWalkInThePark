@@ -62,6 +62,18 @@ void USanityComponent::SetDecreaseSanity(bool bNewDecreaseSanity)
 	UE_LOGFMT(LogSanity, Log, "Sanity decrease status changed: {0}", bNewDecreaseSanity);
 }
 
+void USanityComponent::TriggerEffectsImmediately()
+{
+	TArray<float> Thresholds;
+	Thresholds.Add(IntrusiveThoughtsThreshold);
+	Thresholds.Add(PostProcessThreshold);
+	Thresholds.Add(CameraTiltThreshold);
+	Thresholds.Add(AmbienceThreshold);
+
+	float MaxThreshold = FMath::Max(Thresholds);
+	SetSanity(MaxThreshold);
+}
+
 void USanityComponent::AllowDecreasingSanity()
 {
 	bCanDecreaseSanity = true;
