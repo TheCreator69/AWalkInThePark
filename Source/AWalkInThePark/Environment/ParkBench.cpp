@@ -49,16 +49,7 @@ void AParkBench::Interact_Implementation(AActor* Source)
 	Player->SetActorLocation(CameraComponent->GetComponentLocation() - FVector(0.0, 0.0, 64.0));
 	Player->Controller->SetControlRotation(CameraComponent->GetComponentRotation());
 
-	K2_OnPlayerSitDown();
-
-	UE_LOGFMT(LogBench, Display, "Player sat down on Park Bench");
-}
-
-void AParkBench::GetUp()
-{
-	K2_OnPlayerGetUp();
-
-	UE_LOGFMT(LogBench, Display, "Player got up from Park Bench");
+	UE_LOGFMT(LogBench, Display, "Player interacted with park bench");
 }
 
 FText AParkBench::GetInteractionPrompt_Implementation()

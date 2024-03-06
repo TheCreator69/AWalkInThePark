@@ -32,6 +32,13 @@ AWalkPawn::AWalkPawn()
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule"));
 	CapsuleComponent->SetupAttachment(DefaultSceneRoot);
 
+	MeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
+	MeshComponent->SetupAttachment(DefaultSceneRoot);
+
+	MontageCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("MontageCamera"));
+	MontageCameraComponent->SetupAttachment(MeshComponent, "HeadSocket");
+	MontageCameraComponent->bAutoActivate = false;
+
 	MusicPlayerComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("MusicPlayer"));
 	MusicPlayerComponent->SetupAttachment(DefaultSceneRoot);
 

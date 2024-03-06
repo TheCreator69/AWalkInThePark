@@ -59,7 +59,12 @@ public:
 	bool bSitMode = false;
 
 	// To let the component know which way is forward while the player is sitting
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 	FRotator SitModeBaseOffset;
+
+	// To rotate the owner's mesh if needed
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
+	FRotator StandingMeshBaseOffset = FRotator(0, -90, 0);
 
 	// Speed at which the camera rotation is supposed to be interpolated to the target rotation offset.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
@@ -71,6 +76,7 @@ public:
 
 private:
 	// Current movement speed, duh
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	float CurrentSpeed = 0.f;
 
 	// How far the owner has moved from the origin of the spline along its path
@@ -81,6 +87,9 @@ private:
 
 	// Set owner's transform based on its distance along the spline
 	void SetOwnerTransformAlongSpline() const;
+
+	// Properly rotate the owner's skeletal mesh according to the current spline rotation
+	void SetOwnerMeshRotation() const;
 
 	// Stop owner when they reach the end of the current spline.
 	void StopOwnerWhenEndReached();
@@ -132,6 +141,7 @@ public:
 	void SetCameraRotationOffset(FRotator NewOffset);
 
 	// Return how close the player is at their max speed, ranging from 0 (standing still) to 1 (at max speed)
+	UFUNCTION(BlueprintCallable)
 	float GetPlayerSpeedPercentage() const;
 
 	/*

@@ -62,6 +62,17 @@ void USplineMovementComponent::SetOwnerTransformAlongSpline() const
 	}
 }
 
+void USplineMovementComponent::SetOwnerMeshRotation() const
+{
+	AWalkPawn* Owner = Cast<AWalkPawn>(GetOwner());
+	if (!Owner) return;
+
+	FTransform SplineTransform = CurrentPath->Spline->GetTransformAtDistanceAlongSpline(DistanceAlongSpline, ESplineCoordinateSpace::World);
+	// A bit of a hack since rotating the skeletal mesh and animations would require more time and expertise from the developer.
+	FRotator MeshRotation = SplineTransform.GetRotation().Rotator() + StandingMeshBaseOffset;
+	Owner->MeshComponent->SetWorldRotation(MeshRotation);
+}
+
 void USplineMovementComponent::StopOwnerWhenEndReached()
 {
 	float SplineTraversalPercentage = DistanceAlongSpline / CurrentPath->Spline->GetSplineLength();
@@ -132,6 +143,7 @@ void USplineMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 	{
 		UpdateDistanceAlongSpline(DeltaTime);
 		SetOwnerTransformAlongSpline();
+		SetOwnerMeshRotation();
 		StopOwnerWhenEndReached();
 	}
 

@@ -10,6 +10,7 @@ class AWalkPawn;
 class AParkBench;
 class UInputMappingContext;
 class UEnhancedInputLocalPlayerSubsystem;
+class UAnimMontage;
 
 // Enum representing the status player is in with regards to sitting
 UENUM(BlueprintType)
@@ -38,10 +39,19 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputMappingContext> SittingMappingContext;
 
+	// The montage played whent the player is sitting down
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
+	TObjectPtr<UAnimMontage> SittingDownMontage;
+
+	// The montage played whent the player is standin up
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
+	TObjectPtr<UAnimMontage> StandingUpMontage;
+
 private:
 	AWalkPawn* Player;
 
 	// Is the player currently sitting on a park bench?
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	TEnumAsByte<SitStatus> SitStatus = Standing;
 
 	AParkBench* CurrentBench;
@@ -61,15 +71,27 @@ public:
 	void OnPlayerGetUp();
 
 	// Whether the player is current sitting
-	bool IsPlayerSitting();
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Sitting")
+	bool IsPlayerSitting() const;
 
 	// Whether the player is allowed to stand up
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Sitting")
 	bool CanPlayerGetUp() const;
 
 private:
+	// Called after sitting down animation montage is complete
+	UFUNCTION()
+	void FinishSitDown(UAnimMontage* Montage, bool bInterrupted);
+
+	// Called after standing up animation montage is complete
+	UFUNCTION()
+	void FinishGetUp(UAnimMontage* Montage, bool bInterrupted);
+
 	void AddMappingContext(UInputMappingContext* MappingContext) const;
 
 	void RemoveMappingContext(UInputMappingContext* MappingContext) const;
 
 	UEnhancedInputLocalPlayerSubsystem* GetEnhancedInputSubsystem() const;
+
+	void PlayAnimMontage(UAnimMontage* Montage) const;
 };

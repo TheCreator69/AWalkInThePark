@@ -53,19 +53,16 @@ protected:
 	void AllowPlayerToGetUp();
 
 public:
-	// Event dispatched when the player sits down (used for blueprint scripting)
+	// Event dispatched when the player finishes sitting down (used for blueprint scripting)
 	UFUNCTION(BlueprintImplementableEvent, Category = "Sitting", meta = (DisplayName = "PlayerSitDown"))
 	void K2_OnPlayerSitDown();
 
-	// Event dispatched when the player stands up (used for blueprint scripting)
+	// Event dispatched when the player finishes standing up (used for blueprint scripting)
 	UFUNCTION(BlueprintImplementableEvent, Category = "Sitting", meta = (DisplayName = "PlayerGetUp"))
 	void K2_OnPlayerGetUp();
 
 	// Used to sit the player down on the park bench
 	void Interact_Implementation(AActor* Source);
-
-	// Function called by Player pawn's sitting component when player gets up
-	void GetUp();
 
 	// C++ implementation of GetInteractionPrompt() from IInteractiveActor
 	FText GetInteractionPrompt_Implementation();

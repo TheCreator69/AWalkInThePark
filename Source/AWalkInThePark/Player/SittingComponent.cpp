@@ -9,6 +9,8 @@
 #include "SplineMovementComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
+#include "Animation/AnimInstance.h"
+#include "Animation/AnimMontage.h"
 
 // Sets default values for this component's properties
 USittingComponent::USittingComponent()
@@ -38,12 +40,18 @@ void USittingComponent::OnPlayerSitDown(AParkBench* TargetBench)
 	Player->SplineMovementComponent->SitModeBaseOffset = TargetBench->CameraComponent->GetComponentRotation();
 
 	CurrentBench = TargetBench;
-	SitStatus = ForcedSitting;
 
 	RemoveMappingContext(WalkingMappingContext);
-	AddMappingContext(SittingMappingContext);
 
-	UE_LOGFMT(LogSitting, Display, "Player sat down");
+	PlayAnimMontage(SittingDownMontage);
+
+	UAnimInstance* AnimInstance = Player->MeshComponent->GetAnimInstance();
+	AnimInstance->OnMontageEnded.AddDynamic(this, &USittingComponent::FinishSitDown);
+
+	Player->MontageCameraComponent->Activate();
+	Player->CameraComponent->Deactivate();
+
+	UE_LOGFMT(LogSitting, Display, "Player started sitting down");
 }
 
 void USittingComponent::AllowPlayerToGetUp()
@@ -66,18 +74,20 @@ void USittingComponent::OnPlayerGetUp()
 	// Ugly hack part #2
 	Player->SplineMovementComponent->bSitMode = false;
 
-	CurrentBench->GetUp();
-	CurrentBench = nullptr;
-
-	SitStatus = Standing;
-
 	RemoveMappingContext(SittingMappingContext);
-	AddMappingContext(WalkingMappingContext);
+
+	PlayAnimMontage(StandingUpMontage);
+
+	UAnimInstance* AnimInstance = Player->MeshComponent->GetAnimInstance();
+	AnimInstance->OnMontageEnded.AddDynamic(this, &USittingComponent::FinishGetUp);
+
+	Player->MontageCameraComponent->Activate();
+	Player->CameraComponent->Deactivate();
 
 	UE_LOGFMT(LogSitting, Display, "Player got up");
 }
 
-bool USittingComponent::IsPlayerSitting()
+bool USittingComponent::IsPlayerSitting() const
 {
 	return SitStatus != Standing;
 }
@@ -85,6 +95,41 @@ bool USittingComponent::IsPlayerSitting()
 bool USittingComponent::CanPlayerGetUp() const
 {
 	return SitStatus != ForcedSitting;
+}
+
+void USittingComponent::FinishSitDown(UAnimMontage* Montage, bool bInterrupted)
+{
+	SitStatus = ForcedSitting;
+
+	CurrentBench->K2_OnPlayerSitDown();
+
+	AddMappingContext(SittingMappingContext);
+
+	UAnimInstance* AnimInstance = Player->MeshComponent->GetAnimInstance();
+	AnimInstance->OnMontageEnded.RemoveDynamic(this, &USittingComponent::FinishSitDown);
+
+	Player->CameraComponent->Activate();
+	Player->MontageCameraComponent->Deactivate();
+
+	UE_LOGFMT(LogSitting, Display, "Player finished sitting down");
+}
+
+void USittingComponent::FinishGetUp(UAnimMontage* Montage, bool bInterrupted)
+{
+	SitStatus = Standing;
+
+	CurrentBench->K2_OnPlayerGetUp();
+	CurrentBench = nullptr;
+
+	AddMappingContext(WalkingMappingContext);
+
+	UAnimInstance* AnimInstance = Player->MeshComponent->GetAnimInstance();
+	AnimInstance->OnMontageEnded.RemoveDynamic(this, &USittingComponent::FinishGetUp);
+
+	Player->CameraComponent->Activate();
+	Player->MontageCameraComponent->Deactivate();
+
+	UE_LOGFMT(LogSitting, Display, "Player finished getting up");
 }
 
 void USittingComponent::AddMappingContext(UInputMappingContext* MappingContext) const
@@ -105,5 +150,16 @@ UEnhancedInputLocalPlayerSubsystem* USittingComponent::GetEnhancedInputSubsystem
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
 
 	return Subsystem;
+}
+
+void USittingComponent::PlayAnimMontage(UAnimMontage* Montage) const
+{
+	if (!Montage) return;
+
+	UAnimInstance* AnimInstance = Player->MeshComponent->GetAnimInstance();
+	
+	float Duration = AnimInstance->Montage_Play(Montage, 1.0f, EMontagePlayReturnType::Duration);
+		
+	UE_LOGFMT(LogSitting, Display, "Animation montage started playing with duration: {0}", Duration);
 }
 
