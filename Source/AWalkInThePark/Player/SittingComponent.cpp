@@ -37,7 +37,11 @@ void USittingComponent::OnPlayerSitDown(AParkBench* TargetBench)
 	// To prevent component from immediately resetting player's location and control rotation.
 	// Ugly hack, but that way I can use the camera rotation code without having to rewrite it for when the player is sitting.
 	Player->SplineMovementComponent->bSitMode = true;
+	// Offset value ... fresh from my ass.
+	Player->SplineMovementComponent->SitModeLocation = TargetBench->CameraComponent->GetComponentLocation() + FVector(0, 0, -40);
 	Player->SplineMovementComponent->SitModeBaseOffset = TargetBench->CameraComponent->GetComponentRotation();
+
+	Player->CameraComponent->SetRelativeLocation(FVector(12, 0, 48));
 
 	CurrentBench = TargetBench;
 
@@ -73,6 +77,8 @@ void USittingComponent::OnPlayerGetUp()
 	}
 	// Ugly hack part #2
 	Player->SplineMovementComponent->bSitMode = false;
+
+	Player->CameraComponent->SetRelativeLocation(FVector(12, 0, 64));
 
 	RemoveMappingContext(SittingMappingContext);
 

@@ -58,6 +58,10 @@ public:
 	// I am a bit stupid, so this is a hack variable to let the component know it's supposed to respect the player's location and rotation offset while sitting.
 	bool bSitMode = false;
 
+	// To reposition the player to sit on the bench
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+	FVector SitModeLocation;
+
 	// To let the component know which way is forward while the player is sitting
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
 	FRotator SitModeBaseOffset;

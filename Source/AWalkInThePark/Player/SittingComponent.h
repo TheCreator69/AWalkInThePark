@@ -47,6 +47,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
 	TObjectPtr<UAnimMontage> StandingUpMontage;
 
+
+
 private:
 	AWalkPawn* Player;
 

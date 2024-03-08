@@ -7,6 +7,7 @@
 #include "../Core/WalkDefines.h"
 #include "Kismet/GameplayStatics.h"
 #include "../Player/SittingComponent.h"
+#include "Components/ArrowComponent.h"
 
 // Sets default values
 AParkBench::AParkBench()
@@ -20,8 +21,12 @@ AParkBench::AParkBench()
 	BenchComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Bench"));
 	BenchComponent->SetupAttachment(DefaultSceneRoot);
 
-	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("ViewTarget"));
-	CameraComponent->SetupAttachment(DefaultSceneRoot);
+	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("ViewTargetIndicator"));
+	CameraComponent->SetupAttachment(BenchComponent);
+
+	SitDownStartRotationComponent = CreateDefaultSubobject<UArrowComponent>(TEXT("SitDownStartRotation"));
+	SitDownStartRotationComponent->SetupAttachment(BenchComponent);
+	SitDownStartRotationComponent->SetRelativeRotation(SitDownStartRotation);
 }
 
 // Called when the game starts or when spawned
@@ -46,8 +51,7 @@ void AParkBench::Interact_Implementation(AActor* Source)
 	Player->SittingComponent->OnPlayerSitDown(this);
 	bCanPlayerSit = false;
 
-	Player->SetActorLocation(CameraComponent->GetComponentLocation() - FVector(0.0, 0.0, 64.0));
-	Player->Controller->SetControlRotation(CameraComponent->GetComponentRotation());
+	Player->SetActorLocation(GetActorLocation() + SitDownStart);
 
 	UE_LOGFMT(LogBench, Display, "Player interacted with park bench");
 }

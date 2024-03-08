@@ -37,6 +37,8 @@ void USplineMovementComponent::SetOwnerTransformAlongSpline() const
 	// Fuck this.
 	if (bSitMode)
 	{
+		Owner->SetActorLocation(SitModeLocation);
+
 		const FRotator InterpCameraRotationOffset = FMath::RInterpTo(
 			Owner->GetControlRotation(), 
 			SitModeBaseOffset + CameraRotationOffset, 
@@ -67,10 +69,17 @@ void USplineMovementComponent::SetOwnerMeshRotation() const
 	AWalkPawn* Owner = Cast<AWalkPawn>(GetOwner());
 	if (!Owner) return;
 
-	FTransform SplineTransform = CurrentPath->Spline->GetTransformAtDistanceAlongSpline(DistanceAlongSpline, ESplineCoordinateSpace::World);
-	// A bit of a hack since rotating the skeletal mesh and animations would require more time and expertise from the developer.
-	FRotator MeshRotation = SplineTransform.GetRotation().Rotator() + StandingMeshBaseOffset;
-	Owner->MeshComponent->SetWorldRotation(MeshRotation);
+	if (bSitMode)
+	{
+		Owner->MeshComponent->SetWorldRotation(SitModeBaseOffset + FRotator(0, -90, 0));
+	}
+	else
+	{
+		FTransform SplineTransform = CurrentPath->Spline->GetTransformAtDistanceAlongSpline(DistanceAlongSpline, ESplineCoordinateSpace::World);
+		// A bit of a hack since rotating the skeletal mesh and animations would require more time and expertise from the developer.
+		FRotator MeshRotation = SplineTransform.GetRotation().Rotator() + StandingMeshBaseOffset;
+		Owner->MeshComponent->SetWorldRotation(MeshRotation);
+	}
 }
 
 void USplineMovementComponent::StopOwnerWhenEndReached()
@@ -79,7 +88,7 @@ void USplineMovementComponent::StopOwnerWhenEndReached()
 	if (SplineTraversalPercentage >= 1.f)
 	{
 		CurrentSpeed = 0.f;
-		UE_LOGFMT(LogSplineMovement, Display, "Owner reached end of spline");
+		UE_LOGFMT(LogSplineMovement, Verbose, "Owner reached end of spline");
 	}
 }
 

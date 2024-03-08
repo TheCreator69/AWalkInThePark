@@ -10,6 +10,7 @@
 class UCameraComponent;
 class AWalkPawn;
 class AWalkPath;
+class UArrowComponent;
 
 // The park benches the player uses to rest and save their progress on. Also serve as instigators for new monster introductions
 UCLASS()
@@ -29,13 +30,25 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UStaticMeshComponent> BenchComponent;
 
-	// View target when sitting
+	// Camera location when sitting
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UCameraComponent> CameraComponent;
+
+	// Component indicating the rotation the player starts at when initializing their "sitting down" animation
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UArrowComponent> SitDownStartRotationComponent;
 
 	// The walk path player should take after getting back up
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Sitting")
 	TObjectPtr<AWalkPath> NextPath;
+
+	// Relative location that the player initializes their "sitting down" animation from
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sitting", meta = (MakeEditWidget))
+	FVector SitDownStart = FVector(0);
+
+	// Relative rotation that the player faces when initializing their "sitting down" animation
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sitting")
+	FRotator SitDownStartRotation = FRotator(0);
 
 private:
 	// Whether the player can sit on this bench or not.
