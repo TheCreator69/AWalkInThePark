@@ -16,6 +16,7 @@
 #include "../Core/WalkDefines.h"
 #include "../Environment/ParkBench.h"
 #include "SittingComponent.h"
+#include "WalkCameraActor.h"
 
 // Sets default values
 AWalkPawn::AWalkPawn()
@@ -28,16 +29,13 @@ AWalkPawn::AWalkPawn()
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	CameraComponent->SetupAttachment(DefaultSceneRoot);
+	CameraComponent->SetRelativeLocation(FVector(12, 0, 64));
 
 	CapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Capsule"));
 	CapsuleComponent->SetupAttachment(DefaultSceneRoot);
 
 	MeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
 	MeshComponent->SetupAttachment(DefaultSceneRoot);
-
-	MontageCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("MontageCamera"));
-	MontageCameraComponent->SetupAttachment(MeshComponent, "HeadSocket");
-	MontageCameraComponent->bAutoActivate = false;
 
 	MusicPlayerComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("MusicPlayer"));
 	MusicPlayerComponent->SetupAttachment(DefaultSceneRoot);
@@ -47,6 +45,10 @@ AWalkPawn::AWalkPawn()
 
 	IntrusiveThoughtsComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("IntrusiveThoughts"));
 	IntrusiveThoughtsComponent->SetupAttachment(DefaultSceneRoot);
+
+	ViewTargetComponent = CreateDefaultSubobject<UChildActorComponent>(TEXT("ViewTarget"));
+	ViewTargetComponent->SetChildActorClass(AWalkCameraActor::StaticClass());
+	ViewTargetComponent->SetupAttachment(MeshComponent, "HeadSocket");
 
 	SplineMovementComponent = CreateDefaultSubobject<USplineMovementComponent>(TEXT("SplineMovementComponent"));
 	InteractionComponent = CreateDefaultSubobject<UInteractionComponent>(TEXT("InteractionComponent"));

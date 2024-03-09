@@ -43,11 +43,21 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
 	TObjectPtr<UAnimMontage> SittingDownMontage;
 
-	// The montage played whent the player is standin up
+	// The montage played whent the player is standing up
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Animation")
 	TObjectPtr<UAnimMontage> StandingUpMontage;
 
+	// Relative location of the gameplay camera while the player is sitting
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+	FVector CameraRelativeSitLocation = FVector(12, 0, 48);
 
+	// Relative location of the gameplay camera while the player is standing
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+	FVector CameraRelativeStandLocation = FVector(12, 0, 64);
+
+	// Time it takes to blend between montage and gameplay cameras
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Camera")
+	float CameraBlendTime = 0.25f;
 
 private:
 	AWalkPawn* Player;

@@ -46,10 +46,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UCameraComponent> CameraComponent;
 
-	// Camera used as view target during animation montages (used for camera movement bound to animations)
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	TObjectPtr<UCameraComponent> MontageCameraComponent;
-
 	// Capsule component used for collision detection with triggers
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<UCapsuleComponent> CapsuleComponent;
@@ -57,6 +53,10 @@ public:
 	// Skeletal mesh component used for visual representation in the world
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<USkeletalMeshComponent> MeshComponent;
+
+	// Hack actor used to switch camera view targets smoothly
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	TObjectPtr<UChildActorComponent> ViewTargetComponent;
 
 	// Component responsible for moving player along a spline
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")

@@ -41,7 +41,7 @@ void USittingComponent::OnPlayerSitDown(AParkBench* TargetBench)
 	Player->SplineMovementComponent->SitModeLocation = TargetBench->CameraComponent->GetComponentLocation() + FVector(0, 0, -40);
 	Player->SplineMovementComponent->SitModeBaseOffset = TargetBench->CameraComponent->GetComponentRotation();
 
-	Player->CameraComponent->SetRelativeLocation(FVector(12, 0, 48));
+	Player->CameraComponent->SetRelativeLocation(CameraRelativeSitLocation);
 
 	CurrentBench = TargetBench;
 
@@ -52,8 +52,7 @@ void USittingComponent::OnPlayerSitDown(AParkBench* TargetBench)
 	UAnimInstance* AnimInstance = Player->MeshComponent->GetAnimInstance();
 	AnimInstance->OnMontageEnded.AddDynamic(this, &USittingComponent::FinishSitDown);
 
-	Player->MontageCameraComponent->Activate();
-	Player->CameraComponent->Deactivate();
+	UGameplayStatics::GetPlayerController(this, 0)->SetViewTargetWithBlend(Player->ViewTargetComponent->GetChildActor(), CameraBlendTime);
 
 	UE_LOGFMT(LogSitting, Display, "Player started sitting down");
 }
@@ -78,7 +77,7 @@ void USittingComponent::OnPlayerGetUp()
 	// Ugly hack part #2
 	Player->SplineMovementComponent->bSitMode = false;
 
-	Player->CameraComponent->SetRelativeLocation(FVector(12, 0, 64));
+	Player->CameraComponent->SetRelativeLocation(CameraRelativeStandLocation);
 
 	RemoveMappingContext(SittingMappingContext);
 
@@ -87,8 +86,7 @@ void USittingComponent::OnPlayerGetUp()
 	UAnimInstance* AnimInstance = Player->MeshComponent->GetAnimInstance();
 	AnimInstance->OnMontageEnded.AddDynamic(this, &USittingComponent::FinishGetUp);
 
-	Player->MontageCameraComponent->Activate();
-	Player->CameraComponent->Deactivate();
+	UGameplayStatics::GetPlayerController(this, 0)->SetViewTargetWithBlend(Player->ViewTargetComponent->GetChildActor(), CameraBlendTime);
 
 	UE_LOGFMT(LogSitting, Display, "Player got up");
 }
@@ -114,8 +112,7 @@ void USittingComponent::FinishSitDown(UAnimMontage* Montage, bool bInterrupted)
 	UAnimInstance* AnimInstance = Player->MeshComponent->GetAnimInstance();
 	AnimInstance->OnMontageEnded.RemoveDynamic(this, &USittingComponent::FinishSitDown);
 
-	Player->CameraComponent->Activate();
-	Player->MontageCameraComponent->Deactivate();
+	UGameplayStatics::GetPlayerController(this, 0)->SetViewTargetWithBlend(Player, CameraBlendTime);
 
 	UE_LOGFMT(LogSitting, Display, "Player finished sitting down");
 }
@@ -132,8 +129,7 @@ void USittingComponent::FinishGetUp(UAnimMontage* Montage, bool bInterrupted)
 	UAnimInstance* AnimInstance = Player->MeshComponent->GetAnimInstance();
 	AnimInstance->OnMontageEnded.RemoveDynamic(this, &USittingComponent::FinishGetUp);
 
-	Player->CameraComponent->Activate();
-	Player->MontageCameraComponent->Deactivate();
+	UGameplayStatics::GetPlayerController(this, 0)->SetViewTargetWithBlend(Player, CameraBlendTime);
 
 	UE_LOGFMT(LogSitting, Display, "Player finished getting up");
 }
