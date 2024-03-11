@@ -17,6 +17,8 @@
 #include "../Environment/ParkBench.h"
 #include "SittingComponent.h"
 #include "WalkCameraActor.h"
+#include "AudioModulationStatics.h"
+#include "SoundControlBusMix.h"
 
 // Sets default values
 AWalkPawn::AWalkPawn()
@@ -117,6 +119,15 @@ void AWalkPawn::ToggleMusic(const FInputActionValue& Value)
 {
 	MusicPlayerComponent->SetPaused(!MusicPlayerComponent->bIsPaused);
 	OnMusicStateChanged.Broadcast(MusicPlayerComponent->bIsPaused);
+
+	if (MusicPlayerComponent->bIsPaused)
+	{
+		UAudioModulationStatics::DeactivateBusMix(GetWorld(), MusicOnBusMix);
+	}
+	else
+	{
+		UAudioModulationStatics::ActivateBusMix(GetWorld(), MusicOnBusMix);
+	}
 
 	UE_LOGFMT(LogWalkPlayer, Verbose, "Toggle music input triggered");
 }

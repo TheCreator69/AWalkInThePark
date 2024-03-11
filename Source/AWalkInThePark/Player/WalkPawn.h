@@ -16,6 +16,7 @@ class USanityComponent;
 class UCapsuleComponent;
 class AParkBench;
 class USittingComponent;
+class USoundControlBusMix;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMusicPlayStateChanged, bool, bIsPaused);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartOverlapSafeZone);
@@ -129,6 +130,10 @@ public:
 	// Event dispatched when the music starts/stops playing
 	UPROPERTY(BlueprintAssignable, Category = "Music")
 	FMusicPlayStateChanged OnMusicStateChanged;
+
+	// Control bus mix for modulating sounds when music is playing
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Music")
+	TObjectPtr<USoundControlBusMix> MusicOnBusMix;
 
 	// Event dispatched when player starts overlapping a safe zone
 	UPROPERTY(BlueprintAssignable, Category = "Safe Zone")
