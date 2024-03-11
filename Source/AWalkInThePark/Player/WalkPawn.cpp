@@ -17,8 +17,7 @@
 #include "../Environment/ParkBench.h"
 #include "SittingComponent.h"
 #include "WalkCameraActor.h"
-#include "AudioModulationStatics.h"
-#include "SoundControlBusMix.h"
+#include "MusicAudioComponent.h"
 
 // Sets default values
 AWalkPawn::AWalkPawn()
@@ -39,7 +38,7 @@ AWalkPawn::AWalkPawn()
 	MeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
 	MeshComponent->SetupAttachment(DefaultSceneRoot);
 
-	MusicPlayerComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("MusicPlayer"));
+	MusicPlayerComponent = CreateDefaultSubobject<UMusicAudioComponent>(TEXT("MusicPlayer"));
 	MusicPlayerComponent->SetupAttachment(DefaultSceneRoot);
 
 	LowSanityAmbienceComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("LowSanityAmbience"));
@@ -87,7 +86,6 @@ void AWalkPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Input->BindAction(ChangeSpeedAction, ETriggerEvent::Triggered, this, &AWalkPawn::ChangeSpeed);
 	Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &AWalkPawn::Look);
 	Input->BindAction(ToggleMusicAction, ETriggerEvent::Triggered, this, &AWalkPawn::ToggleMusic);
-	Input->BindAction(ChangeSongAction, ETriggerEvent::Triggered, this, &AWalkPawn::ChangeSong);
 	Input->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AWalkPawn::Interact);
 	Input->BindAction(GetUpAction, ETriggerEvent::Triggered, this, &AWalkPawn::GetUp);
 	Input->BindAction(SaveGameAction, ETriggerEvent::Triggered, this, &AWalkPawn::SaveGame);
@@ -117,29 +115,9 @@ void AWalkPawn::Look(const FInputActionValue& Value)
 
 void AWalkPawn::ToggleMusic(const FInputActionValue& Value)
 {
-	MusicPlayerComponent->SetPaused(!MusicPlayerComponent->bIsPaused);
-	OnMusicStateChanged.Broadcast(MusicPlayerComponent->bIsPaused);
-
-	if (MusicPlayerComponent->bIsPaused)
-	{
-		UAudioModulationStatics::DeactivateBusMix(GetWorld(), MusicOnBusMix);
-	}
-	else
-	{
-		UAudioModulationStatics::ActivateBusMix(GetWorld(), MusicOnBusMix);
-	}
+	MusicPlayerComponent->ToggleMusic();
 
 	UE_LOGFMT(LogWalkPlayer, Verbose, "Toggle music input triggered");
-}
-
-void AWalkPawn::ChangeSong(const FInputActionValue& Value)
-{
-	if (MusicPlayerComponent->bIsPaused) return;
-
-	MusicPlayerComponent->SetSound(bIsPlayingWaterMask ? MusicTrackParkMask : MusicTrackWaterMask);
-	bIsPlayingWaterMask = !bIsPlayingWaterMask;
-
-	UE_LOGFMT(LogWalkPlayer, Verbose, "Change song input triggered");
 }
 
 void AWalkPawn::Interact(const FInputActionValue& Value)

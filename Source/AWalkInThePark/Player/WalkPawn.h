@@ -16,9 +16,8 @@ class USanityComponent;
 class UCapsuleComponent;
 class AParkBench;
 class USittingComponent;
-class USoundControlBusMix;
+class UMusicAudioComponent;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMusicPlayStateChanged, bool, bIsPaused);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartOverlapSafeZone);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEndOverlapSafeZone);
 
@@ -65,7 +64,7 @@ public:
 
 	// Component used to play music
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	TObjectPtr<UAudioComponent> MusicPlayerComponent;
+	TObjectPtr<UMusicAudioComponent> MusicPlayerComponent;
 
 	// Component used to play low sanity ambience
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
@@ -86,14 +85,6 @@ public:
 	// Component used to manage gameplay changes when sitting down and standing up
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	TObjectPtr<USittingComponent> SittingComponent;
-	
-	// Music track used to mask the water monster's sounds
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
-	TObjectPtr<USoundBase> MusicTrackWaterMask;
-
-	// Music track used to mask the park monster's sounds
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
-	TObjectPtr<USoundBase> MusicTrackParkMask;
 
 	// The mapping context used to define input actions that should always be available
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
@@ -111,10 +102,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputAction> ToggleMusicAction;
 
-	// Input action used for changing songs
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
-	TObjectPtr<UInputAction> ChangeSongAction;
-
 	// Input action used for interaction
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputAction> InteractAction;
@@ -127,14 +114,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputAction> SaveGameAction;
 
-	// Event dispatched when the music starts/stops playing
-	UPROPERTY(BlueprintAssignable, Category = "Music")
-	FMusicPlayStateChanged OnMusicStateChanged;
-
-	// Control bus mix for modulating sounds when music is playing
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Music")
-	TObjectPtr<USoundControlBusMix> MusicOnBusMix;
-
 	// Event dispatched when player starts overlapping a safe zone
 	UPROPERTY(BlueprintAssignable, Category = "Safe Zone")
 	FStartOverlapSafeZone OnBeginOverlapSafeZone;
@@ -142,10 +121,6 @@ public:
 	// Event dispatched when player stops overlapping a safe zone
 	UPROPERTY(BlueprintAssignable, Category = "Safe Zone")
 	FEndOverlapSafeZone OnEndOverlapSafeZone;
-
-private:
-	// Is the current music being played the track that masks the water monster?
-	bool bIsPlayingWaterMask = true;
 
 protected:
 	// Called when the game starts or when spawned
@@ -174,10 +149,6 @@ private:
 	// Toggle music player
 	UFUNCTION()
 	void ToggleMusic(const FInputActionValue& Value);
-
-	// Change the song being played. Doesn't do anything if music is off
-	UFUNCTION()
-	void ChangeSong(const FInputActionValue& Value);
 
 	// Interact with objects in the world (primarily used for sitting down/getting up)
 	UFUNCTION()

@@ -8,6 +8,7 @@
 #include "Camera/CameraComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "../Core/WalkDefines.h"
+#include "MusicAudioComponent.h"
 
 // Sets default values for this component's properties
 USanityComponent::USanityComponent()
@@ -25,7 +26,7 @@ void USanityComponent::BeginPlay()
 	AWalkPawn* Owner = Cast<AWalkPawn>(GetOwner());
 	if (!Owner) return;
 
-	Owner->OnMusicStateChanged.AddUniqueDynamic(this, &USanityComponent::SetDecreaseSanity);
+	Owner->MusicPlayerComponent->OnMusicStateChanged.AddUniqueDynamic(this, &USanityComponent::SetDecreaseSanity);
 	Owner->OnBeginOverlapSafeZone.AddUniqueDynamic(this, &USanityComponent::ProhibitDecreasingSanityAndReset);
 	Owner->OnEndOverlapSafeZone.AddUniqueDynamic(this, &USanityComponent::AllowDecreasingSanity);
 }
