@@ -13,6 +13,7 @@ UMusicAudioComponent::UMusicAudioComponent()
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = false;
+	SetAutoActivate(false);
 }
 
 void UMusicAudioComponent::BeginPlay()
@@ -22,22 +23,15 @@ void UMusicAudioComponent::BeginPlay()
 	OnAudioFinished.AddDynamic(this, &UMusicAudioComponent::FinishStopMusic);
 }
 
-void UMusicAudioComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	Super::EndPlay(EndPlayReason);
-
-	GetWorld()->GetTimerManager().ClearTimer(HeadphoneBlipTimerHandle);
-}
-
 void UMusicAudioComponent::ToggleMusic()
 {
-	if (bIsPaused)
+	if (IsPlaying())
 	{
-		StartMusic();
+		InitializeStopMusic();
 	}
 	else
 	{
-		InitializeStopMusic();
+		StartMusic();
 	}
 }
 
@@ -46,30 +40,35 @@ void UMusicAudioComponent::ChangeMusicTrack(int NewIndex)
 	if (!MusicTracks.IsValidIndex(NewIndex)) return;
 
 	SetSound(MusicTracks[NewIndex]);
+	MusicIndex = NewIndex;
 }
 
 void UMusicAudioComponent::StartMusic()
 {
-	SetPaused(false);
-	OnMusicStateChanged.Broadcast(bIsPaused);
+	Play();
+	OnMusicStateChanged.Broadcast(false);
 	UAudioModulationStatics::ActivateBusMix(GetWorld(), MusicOnBusMix);
-	ISoundParameterControllerInterface::SetTriggerParameter(FName("Resume"));
+	ISoundParameterControllerInterface::SetFloatParameter(PlaybackTimeParam, PlaybackTime);
 
-	UE_LOGFMT(LogMusic, Display, "Music started");
+	PlatformStartTime = FPlatformTime::Seconds();
+
+	UE_LOGFMT(LogMusic, Display, "Music started with playback time: {0}", PlaybackTime);
 }
 
 void UMusicAudioComponent::InitializeStopMusic()
 {
-	GetWorld()->GetTimerManager().SetTimer(HeadphoneBlipTimerHandle, this, &UMusicAudioComponent::FinishStopMusic, HeadphoneSoundDuration);
-	ISoundParameterControllerInterface::SetTriggerParameter(FName("Stop"));
+	PlaybackTime += FPlatformTime::Seconds() - PlatformStartTime;
+	PlaybackTime = FMath::Fmod(PlaybackTime, MusicTrackDurations[MusicIndex]);
+	
+	ISoundParameterControllerInterface::SetTriggerParameter(StopTriggerParam);
 
-	UE_LOGFMT(LogMusic, Display, "Music stop requested");
+	UE_LOGFMT(LogMusic, Display, "Music stop requested. Playback time saved: {0}", PlaybackTime);
 }
 
 void UMusicAudioComponent::FinishStopMusic()
 {
-	SetPaused(true);
-	OnMusicStateChanged.Broadcast(bIsPaused);
+	Stop();
+	OnMusicStateChanged.Broadcast(true);
 	UAudioModulationStatics::DeactivateBusMix(GetWorld(), MusicOnBusMix);
 
 	UE_LOGFMT(LogMusic, Display, "Music stopped");

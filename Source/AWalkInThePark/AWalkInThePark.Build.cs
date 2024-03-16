@@ -15,6 +15,7 @@ public class AWalkInThePark : ModuleRules
 			"InputCore", 
 			"EnhancedInput", 
 			"AudioModulation",
+			"MetasoundEngine"
         });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });

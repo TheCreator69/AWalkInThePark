@@ -7,6 +7,7 @@
 #include "MusicAudioComponent.generated.h"
 
 class USoundControlBusMix;
+struct FMetaSoundOutput;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMusicPlayStateChanged, bool, bIsPaused);
 
@@ -26,33 +27,41 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
 public:
 	// Music tracks available to play during gameplay
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
 	TArray<TObjectPtr<USoundBase>> MusicTracks;
+
+	// Durations of music tracks. A hack because Unreal doesn't report durations accurately
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
+	TArray<double> MusicTrackDurations;
 
 	// Event dispatched when the music starts/stops playing
 	UPROPERTY(BlueprintAssignable, Category = "Music")
 	FMusicPlayStateChanged OnMusicStateChanged;
 
 	// Control bus mix for modulating sounds when music is playing
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Music")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
 	TObjectPtr<USoundControlBusMix> MusicOnBusMix;
 
-	/*
-	* Hard-coded headphone sound duration to delay stopping music by.
-	* Ideally, we'd just listen for an audio stop event, but that doesn't remember the playback time
-	* and then we'd have to manually set the playback time when starting the music again.
-	* But getting the playback time out of the MetaSound graph is very complicated, so hard-coding it is. Yippee!
-	*/
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Music")
-	float HeadphoneSoundDuration = 0.3f;
+	// Trigger parameter to execute to stop the music appropriately
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
+	FName StopTriggerParam = FName("Stop");
+
+	// Float parameter to play music where it was paused at
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Music")
+	FName PlaybackTimeParam = FName("PlaybackTime");
 
 private:
-	// Timer handle used to delay pausing of music until headphone "blip" is done playing.
-	FTimerHandle HeadphoneBlipTimerHandle;
+	// Saved playback time to continue looping music at the correct position
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Music", meta = (AllowPrivateAccess = "true"))
+	double PlaybackTime = 0.0;
+	
+	// Time at which the music started playing
+	double PlatformStartTime;
+
+	// Index of the music track that's currently playing
+	int MusicIndex = 0;
 
 public:
 	// Toggle the music on and off

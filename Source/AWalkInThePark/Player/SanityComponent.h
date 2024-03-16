@@ -97,8 +97,6 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-
 public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -149,9 +147,6 @@ private:
 	// The thought state that is currently selected. Null when intrusive thoughts aren't playing.
 	FThoughtState* CurrentThoughtState;
 
-	// Handle used to schedule new intrusive thought selections.
-	FTimerHandle ThoughtTimerHandle;
-
 	// Select a random valid intrusive thought to start from, play it and schedule the next one after the current one has finished playing.
 	void StartIntrusiveThoughts();
 
@@ -159,11 +154,9 @@ private:
 	void StopIntrusiveThoughts();
 
 	// Select a new intrusive thought to play and schedule the next selection.
+	UFUNCTION()
 	void SelectAndPlayNewThought();
 
 	// Play the currently selected intrusive thought with the appropriate volume in regards to player's sanity.
 	void PlayIntrusiveThought();
-
-	// Schedule the next thought immediately after the current one ends.
-	void ScheduleNextThought();
 };

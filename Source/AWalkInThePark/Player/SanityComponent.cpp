@@ -31,13 +31,6 @@ void USanityComponent::BeginPlay()
 	Owner->OnEndOverlapSafeZone.AddUniqueDynamic(this, &USanityComponent::AllowDecreasingSanity);
 }
 
-void USanityComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
-{
-	Super::EndPlay(EndPlayReason);
-
-	GetWorld()->GetTimerManager().ClearTimer(ThoughtTimerHandle);
-}
-
 void USanityComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	UpdateSanity(DeltaTime);
@@ -164,7 +157,9 @@ void USanityComponent::StartIntrusiveThoughts()
 	CurrentThoughtState = StartStates[StartIndex];
 
 	PlayIntrusiveThought();
-	ScheduleNextThought();
+
+	AWalkPawn* Owner = Cast<AWalkPawn>(GetOwner());
+	Owner->IntrusiveThoughtsComponent->OnAudioFinished.AddDynamic(this, &USanityComponent::SelectAndPlayNewThought);
 
 	UE_LOGFMT(LogSanity, Display, "Started intrusive thoughts with sound: {0}", CurrentThoughtState->Sound->GetFName());
 }
@@ -174,8 +169,8 @@ void USanityComponent::StopIntrusiveThoughts()
 	AWalkPawn* Owner = Cast<AWalkPawn>(GetOwner());
 
 	Owner->IntrusiveThoughtsComponent->Stop();
+	Owner->IntrusiveThoughtsComponent->OnAudioFinished.RemoveDynamic(this, &USanityComponent::SelectAndPlayNewThought);
 	CurrentThoughtState = nullptr;
-	GetWorld()->GetTimerManager().ClearTimer(ThoughtTimerHandle);
 
 	UE_LOGFMT(LogSanity, Display, "Stopped intrusive thoughts");
 }
@@ -206,7 +201,6 @@ void USanityComponent::SelectAndPlayNewThought()
 	}
 
 	PlayIntrusiveThought();
-	ScheduleNextThought();
 }
 
 void USanityComponent::PlayIntrusiveThought()
@@ -219,15 +213,5 @@ void USanityComponent::PlayIntrusiveThought()
 	Owner->IntrusiveThoughtsComponent->Play();
 
 	UE_LOGFMT(LogSanity, Display, "Play intrusive thought: {0}", CurrentThoughtState->Sound->GetFName());
-}
-
-void USanityComponent::ScheduleNextThought()
-{
-	if (!CurrentThoughtState) return;
-
-	float CurrentThoughtDuration = CurrentThoughtState->Sound->GetDuration();
-	GetWorld()->GetTimerManager().SetTimer(ThoughtTimerHandle, this, &USanityComponent::SelectAndPlayNewThought, CurrentThoughtDuration);
-
-	UE_LOGFMT(LogSanity, Display, "Schedule next intrusive thought with delay: {0}", CurrentThoughtDuration);
 }
 

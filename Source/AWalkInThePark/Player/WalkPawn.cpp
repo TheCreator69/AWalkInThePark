@@ -61,8 +61,6 @@ AWalkPawn::AWalkPawn()
 void AWalkPawn::BeginPlay()
 {
 	Super::BeginPlay();
-
-	MusicPlayerComponent->SetPaused(true);
 }
 
 // Called every frame
