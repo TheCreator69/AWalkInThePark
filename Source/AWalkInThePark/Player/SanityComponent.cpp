@@ -109,7 +109,7 @@ void USanityComponent::UpdateSanityEffects()
 	Owner->SplineMovementComponent->SetCameraRotationOffset(FRotator(CurrentOffset.Pitch, CurrentOffset.Yaw, CameraRollOffset));
 
 	// Magic values for post process effects. Makes the screen almost completely grayscale at 0% sanity
-	float SanityAlpha = InvertedSanityAlpha(0.2f);
+	float SanityAlpha = InvertedSanityAlpha(PostProcessThreshold);
 	Owner->CameraComponent->PostProcessSettings.bOverride_ColorSaturation = true;
 	Owner->CameraComponent->PostProcessSettings.ColorSaturation = PostProcessLerp(1, 0.3, SanityAlpha);
 	Owner->CameraComponent->PostProcessSettings.bOverride_ColorContrast = true;

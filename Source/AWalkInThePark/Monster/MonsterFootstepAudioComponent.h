@@ -10,30 +10,28 @@ class AWalkMonster;
 
 // Enum used to return info about whether a threshold was crossed and in which direction
 UENUM(BlueprintType)
-enum ThresholdCrossing
+enum EThresholdCrossing
 {
 	Upwards UMETA(DisplayName = "Upwards"),
 	Downwards UMETA(DisplayName = "Downwards"),
 	NoCross UMETA(DisplayName = "No Cross"),
 };
 
+// Aggression thresholds that cause a change in sounds when crossed
 USTRUCT(BlueprintType)
 struct FSoundThresholds
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	double ToggleHighAggressionSound;
+	double StartFootstepSounds;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	double StartMediumAggressionSound;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	double StopMediumAggressionSound;
+	double StopFootstepSounds;
 
 	FSoundThresholds()
 	{
-		ToggleHighAggressionSound = 0.75;
-		StartMediumAggressionSound = 0.5;
-		StopMediumAggressionSound = 0.25;
+		StartFootstepSounds = 0.5;
+		StopFootstepSounds = 0.25;
 	}
 };
 
@@ -47,17 +45,29 @@ public:
 	// Sets default values for this component's properties
 	UMonsterFootstepAudioComponent();
 
-	// Footstep sound the monster makes when it's at medium aggression
+	// Footstep sound the monster makes when it's retreating
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Footsteps")
-	TObjectPtr<USoundBase> MediumAggressionFootsteps;
+	TObjectPtr<USoundBase> RetreatingFootsteps;
 
 	// Footstep sound the monster makes when it's at high aggression
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Footsteps")
-	TObjectPtr<USoundBase> HighAggressionFootsteps;
+	TObjectPtr<USoundBase> ApproachingFootsteps;
 
 	// Thresholds used to determine at which aggression certain actions should be performed (sound changes, starts & stops)
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Threshold")
 	FSoundThresholds SoundThresholds;
+
+	// Minimum interval at which footstep play. Footsteps get more frequent the higher the monster's aggression is
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Footsteps|Interval", meta = (UIMin = 0, UIMax = 10))
+	float IntervalMin = 0.5f;
+
+	// Maximum interval at which footstep play. Footsteps get more frequent the higher the monster's aggression is
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Footsteps|Interval", meta = (UIMin = 0, UIMax = 10))
+	float IntervalMax = 5.0f;
+
+	// Random offset to add some variation to footstep frequency. Can both increase and decrease interval
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Footsteps|Interval", meta = (UIMin = 0, UIMax = 1))
+	float RandomIntervalOffset = 0.4f;
 
 private:
 	TObjectPtr<AWalkMonster> Owner;
@@ -92,8 +102,8 @@ private:
 	UFUNCTION()
 	void ScheduleNextSound();
 
-	// Play the current footstep sound at the proper volume relative to monster's current aggression
-	void PlaySoundAtProperVolume();
+	// Play the appropriate footstep sound at the proper volume relative to monster's current aggression
+	void PlayRightSoundAtProperVolume();
 
 	// Cancel any scheduled footstep sound and prevent new sound from being scheduled if a sound is still playing
 	void StopMakingSound();
@@ -102,5 +112,5 @@ private:
 	* Returns whether the threshold was crossed between OldAggression and NewAggression and in which direction (upwards or downwards)
 	* If OldAggression and NewAggression are the same, the threshold isn't considered crossed, even if Threshold is identical to aggressions passed in
 	*/
-	TEnumAsByte<ThresholdCrossing> AggressionCrossedThreshold(double& OldAggression, double& NewAggression, double Threshold);
+	TEnumAsByte<EThresholdCrossing> AggressionCrossedThreshold(double& OldAggression, double& NewAggression, double Threshold);
 };

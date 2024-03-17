@@ -127,6 +127,7 @@ private:
 
 	double CalculateAggressionChange(bool bLowerAggression, float SpeedPercentageMultiplier, double OffsetMin, double OffsetMax);
 
+public:
 	// Whether or not the player is looking somewhat towards the monster and moving slowly enough to decrease its aggression
 	bool IsPlayerStaringDownMonster();
 

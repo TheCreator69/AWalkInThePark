@@ -44,29 +44,16 @@ void UMonsterFootstepAudioComponent::TickComponent(float DeltaTime, ELevelTick T
 
 void UMonsterFootstepAudioComponent::ExecuteAggressionThresholdFunctions(double& OldAggression, double& NewAggression)
 {
-	// Switch high and medium aggression sounds if needed
-	TEnumAsByte<ThresholdCrossing> HighAggressionThreshold = AggressionCrossedThreshold(OldAggression, NewAggression, SoundThresholds.ToggleHighAggressionSound);
-	if (HighAggressionThreshold == TEnumAsByte<ThresholdCrossing>(Upwards))
-	{
-		SetSound(HighAggressionFootsteps);
-		UE_LOGFMT(LogMonsterSound, Log, "High aggression sound set");
-	}
-	else if (HighAggressionThreshold == TEnumAsByte<ThresholdCrossing>(Downwards))
-	{
-		SetSound(MediumAggressionFootsteps);
-		UE_LOGFMT(LogMonsterSound, Log, "Medium aggression sound set");
-	}
-
 	// Should start making sound?
-	TEnumAsByte<ThresholdCrossing> MediumAggressionThreshold = AggressionCrossedThreshold(OldAggression, NewAggression, SoundThresholds.StartMediumAggressionSound);
-	if (MediumAggressionThreshold == TEnumAsByte<ThresholdCrossing>(Upwards))
+	TEnumAsByte<EThresholdCrossing> SoundThreshold = AggressionCrossedThreshold(OldAggression, NewAggression, SoundThresholds.StartFootstepSounds);
+	if (SoundThreshold == TEnumAsByte<EThresholdCrossing>(Upwards))
 	{
 		StartMakingSound();
 	}
 
 	// Should stop making sound?
-	TEnumAsByte<ThresholdCrossing> NoSoundThreshold = AggressionCrossedThreshold(OldAggression, NewAggression, SoundThresholds.StopMediumAggressionSound);
-	if (NoSoundThreshold == TEnumAsByte<ThresholdCrossing>(Downwards))
+	TEnumAsByte<EThresholdCrossing> NoSoundThreshold = AggressionCrossedThreshold(OldAggression, NewAggression, SoundThresholds.StopFootstepSounds);
+	if (NoSoundThreshold == TEnumAsByte<EThresholdCrossing>(Downwards))
 	{
 		StopMakingSound();
 	}
@@ -74,47 +61,67 @@ void UMonsterFootstepAudioComponent::ExecuteAggressionThresholdFunctions(double&
 
 void UMonsterFootstepAudioComponent::StartMakingSound()
 {
-	OnAudioFinished.AddDynamic(this, &UMonsterFootstepAudioComponent::ScheduleNextSound);
-	ScheduleNextSound();
+	PlayRightSoundAtProperVolume();
+	OnAudioFinished.AddUniqueDynamic(this, &UMonsterFootstepAudioComponent::ScheduleNextSound);
+
 	UE_LOGFMT(LogMonsterSound, Log, "Start making sound");
 }
 
 void UMonsterFootstepAudioComponent::ScheduleNextSound()
 {
-	GetWorld()->GetTimerManager().SetTimer(FootstepTimerHandle, this, &UMonsterFootstepAudioComponent::PlaySoundAtProperVolume, FMath::RandRange(1.0, 2.0));
-	UE_LOGFMT(LogMonsterSound, Verbose, "Next sound scheduled...");
+	float AggressionAlpha = FMath::Clamp((Owner->GetAggression() - SoundThresholds.StopFootstepSounds) / (1.0 - SoundThresholds.StopFootstepSounds), 0.0, 1.0);
+
+	float TimerDelay = FMath::Lerp<double, double>(IntervalMax, IntervalMin, AggressionAlpha) + FMath::RandRange(-RandomIntervalOffset, RandomIntervalOffset);
+
+	GetWorld()->GetTimerManager().SetTimer(FootstepTimerHandle, this, &UMonsterFootstepAudioComponent::PlayRightSoundAtProperVolume, TimerDelay);
+
+	UE_LOGFMT(LogMonsterSound, Display, "Next sound scheduled with delay of: {0} seconds", TimerDelay);
 }
 
-void UMonsterFootstepAudioComponent::PlaySoundAtProperVolume()
+void UMonsterFootstepAudioComponent::PlayRightSoundAtProperVolume()
 {
+	bool bPlayRetreatingFootsteps = Owner->IsPlayerStaringDownMonster();
+	if (bPlayRetreatingFootsteps)
+	{
+		SetSound(RetreatingFootsteps);
+	}
+	else
+	{
+		SetSound(ApproachingFootsteps);
+	}
+
 	double VolumeAlpha = (Owner->GetAggression() - 0.25) * 4.0;
 	float Multiplier = FMath::Lerp<double, double>(0.25, 1.25, VolumeAlpha);
 	SetVolumeMultiplier(Multiplier);
+
 	Play();
-	UE_LOGFMT(LogMonsterSound, Verbose, "Playing sound with volume multiplier: {0}", Multiplier);
+
+	FString FootstepType = (bPlayRetreatingFootsteps ? TEXT("retreating") : TEXT("approaching"));
+	UE_LOGFMT(LogMonsterSound, Verbose, "Playing {0} sound with volume multiplier: {1}", FootstepType, Multiplier);
 }
 
 void UMonsterFootstepAudioComponent::StopMakingSound()
 {
 	GetWorld()->GetTimerManager().ClearTimer(FootstepTimerHandle);
 	OnAudioFinished.RemoveDynamic(this, &UMonsterFootstepAudioComponent::ScheduleNextSound);
+
 	UE_LOGFMT(LogMonsterSound, Log, "Stop making sound");
 }
 
-TEnumAsByte<ThresholdCrossing> UMonsterFootstepAudioComponent::AggressionCrossedThreshold(double& OldAggression, double& NewAggression, double Threshold)
+TEnumAsByte<EThresholdCrossing> UMonsterFootstepAudioComponent::AggressionCrossedThreshold(double& OldAggression, double& NewAggression, double Threshold)
 {
 	if (NewAggression == OldAggression)
 	{
-		return TEnumAsByte<ThresholdCrossing>(NoCross);
+		return TEnumAsByte<EThresholdCrossing>(NoCross);
 	}
 	else if (OldAggression < NewAggression && OldAggression <= Threshold && NewAggression >= Threshold)
 	{
-		return TEnumAsByte<ThresholdCrossing>(Upwards);
+		return TEnumAsByte<EThresholdCrossing>(Upwards);
 	}
 	else if (OldAggression > NewAggression && OldAggression >= Threshold && NewAggression <= Threshold)
 	{
-		return TEnumAsByte<ThresholdCrossing>(Downwards);
+		return TEnumAsByte<EThresholdCrossing>(Downwards);
 	}
-	return TEnumAsByte<ThresholdCrossing>(NoCross);
+	return TEnumAsByte<EThresholdCrossing>(NoCross);
 }
 
