@@ -95,6 +95,9 @@ private:
 	// Properly rotate the owner's skeletal mesh according to the current spline rotation
 	void SetOwnerMeshRotation() const;
 
+	// Properly rotate shadow monster's static mesh according to the current spline rotation
+	void SetShadowMeshRotation() const;
+
 	// Stop owner when they reach the end of the current spline.
 	void StopOwnerWhenEndReached();
 

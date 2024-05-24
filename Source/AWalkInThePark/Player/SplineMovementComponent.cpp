@@ -8,6 +8,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "../Core/WalkDefines.h"
 #include "Camera/CameraShakeBase.h"
+#include "../Monster/ShadowMonster.h"
 
 // Sets default values for this component's properties
 USplineMovementComponent::USplineMovementComponent()
@@ -82,6 +83,17 @@ void USplineMovementComponent::SetOwnerMeshRotation() const
 	}
 }
 
+void USplineMovementComponent::SetShadowMeshRotation() const
+{
+	AShadowMonster* Owner = Cast<AShadowMonster>(GetOwner());
+	if (!Owner) return;
+
+	FTransform SplineTransform = CurrentPath->Spline->GetTransformAtDistanceAlongSpline(DistanceAlongSpline, ESplineCoordinateSpace::World);
+	// A bit of a hack since rotating the skeletal mesh and animations would require more time and expertise from the developer.
+	FRotator MeshRotation = SplineTransform.GetRotation().Rotator() + StandingMeshBaseOffset;
+	Owner->ShadowMesh->SetWorldRotation(MeshRotation);
+}
+
 void USplineMovementComponent::StopOwnerWhenEndReached()
 {
 	float SplineTraversalPercentage = DistanceAlongSpline / CurrentPath->Spline->GetSplineLength();
@@ -153,6 +165,7 @@ void USplineMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 		UpdateDistanceAlongSpline(DeltaTime);
 		SetOwnerTransformAlongSpline();
 		SetOwnerMeshRotation();
+		SetShadowMeshRotation();
 		StopOwnerWhenEndReached();
 	}
 
