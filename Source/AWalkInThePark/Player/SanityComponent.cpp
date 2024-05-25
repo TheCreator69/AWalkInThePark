@@ -45,7 +45,7 @@ void USanityComponent::SetSanity(float NewSanity)
 		AWalkPawn* Owner = Cast<AWalkPawn>(GetOwner());
 		if (!Owner) return;
 
-		Owner->KillPlayer(TEnumAsByte<PlayerDeathReason>(Insanity));
+		Owner->KillPlayer(TEnumAsByte<EPlayerDeathReason>(Insanity));
 	}
 	UE_LOGFMT(LogSanity, Verbose, "Sanity changed: {0}", Sanity);
 }

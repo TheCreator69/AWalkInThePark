@@ -64,4 +64,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AccelerateToSpeed(float TargetSpeed, float Duration);
 
+private:
+	UFUNCTION()
+	void OnLightDisablerOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
 };

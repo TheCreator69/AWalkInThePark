@@ -81,6 +81,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Aggression")
 	TObjectPtr<UCurveFloat> AggressionChangeCurve;
 
+	/* Is this monster the water monster ? If not, assume this monster is the park monster.
+	Used for player death to know which monster they died from.
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Identity")
+	bool bIsWaterMonster = true;
+
 private:
 	// The monster's current aggression. Influences noise making
 	UPROPERTY(BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -103,14 +109,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Stalking")
 	void ActivateMonster();
 
-private:
-	// Reactivate the monster so it can start stalking the player. Used by safe zone to reactivate monster, is possible
-	UFUNCTION()
-	void ReactivateMonster();
-
 	// Deactivate the monster so it can become "passive" again. Also resets monster's aggression
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = "Stalking")
 	void DeactivateMonster();
+
+	// Reactivate the monster so it can start stalking the player. Used by safe zone to reactivate monster, is possible
+	UFUNCTION(BlueprintCallable, Category = "Stalking")
+	void ReactivateMonster();
 
 public:
 	// Get the monster's current aggression

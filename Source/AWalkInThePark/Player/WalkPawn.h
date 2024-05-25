@@ -22,10 +22,12 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartOverlapSafeZone);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEndOverlapSafeZone);
 
 UENUM(BlueprintType)
-enum PlayerDeathReason
+enum EPlayerDeathReason
 {
 	Insanity UMETA(DisplayName = "Insanity"),
-	Monster UMETA(DisplayName = "Monster"),
+	WaterMonster UMETA(DisplayName = "Water Monster"),
+	ParkMonster UMETA(DisplayName = "Park Monster"),
+	ShadowMonster UMETA(DisplayName = "Shadow Monster"),
 };
 
 // Default pawn implementing spline-based movement and other essential player functionality
@@ -135,7 +137,7 @@ public:
 
 	// Kill the player!!! And also specify a reason
 	UFUNCTION()
-	void KillPlayer(TEnumAsByte<PlayerDeathReason> Reason);
+	void KillPlayer(TEnumAsByte<EPlayerDeathReason> Reason);
 
 private:
 	// Accelerate/decelerate the pawn along a spline

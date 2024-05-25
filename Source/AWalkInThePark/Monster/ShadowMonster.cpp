@@ -5,6 +5,8 @@
 #include "../Player/SplineMovementComponent.h"
 #include "Components/SphereComponent.h"
 #include "Camera/CameraComponent.h"
+#include "../Player/WalkPawn.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 AShadowMonster::AShadowMonster()
@@ -31,6 +33,8 @@ AShadowMonster::AShadowMonster()
 void AShadowMonster::BeginPlay()
 {
 	Super::BeginPlay();
+
+	LightDisabler->OnComponentBeginOverlap.AddUniqueDynamic(this, &AShadowMonster::OnLightDisablerOverlap);
 }
 
 void AShadowMonster::Tick(float DeltaTime)
@@ -60,5 +64,13 @@ void AShadowMonster::AccelerateToSpeed(float TargetSpeed, float Duration)
 	AccelerationPerTick = TargetSpeed / Duration;
 	TimeAccelerated = 0.f;
 	TimeNeededToAccelerate = Duration;
+}
+
+void AShadowMonster::OnLightDisablerOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	AWalkPawn* PlayerPawn = Cast<AWalkPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	if (!PlayerPawn) return;
+
+	PlayerPawn->KillPlayer(TEnumAsByte<EPlayerDeathReason>(ShadowMonster));
 }
 

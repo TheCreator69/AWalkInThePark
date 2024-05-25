@@ -89,7 +89,7 @@ void AWalkPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	Input->BindAction(SaveGameAction, ETriggerEvent::Triggered, this, &AWalkPawn::SaveGame);
 }
 
-void AWalkPawn::KillPlayer(TEnumAsByte<PlayerDeathReason> Reason)
+void AWalkPawn::KillPlayer(TEnumAsByte<EPlayerDeathReason> Reason)
 {
 	UE_LOGFMT(LogWalkPlayer, Verbose, "Player is dead with reason: {0}", Reason.GetValue());
 }
