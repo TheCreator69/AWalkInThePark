@@ -26,7 +26,10 @@ void UInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
+	AActor* PreviousTarget = TargetedActor;
+
 	TraceForInteractiveActor();
+	FireTargetEventsIfNecessary(PreviousTarget);
 }
 
 void UInteractionComponent::TraceForInteractiveActor()
@@ -60,4 +63,18 @@ void UInteractionComponent::GetStartAndEndOfTrace(FVector& OutStart, FVector& Ou
 
 	OutStart = Owner->FindComponentByClass<UCameraComponent>()->GetComponentLocation();
 	OutEnd = OutStart + Owner->FindComponentByClass<UCameraComponent>()->GetForwardVector() * TraceDistance;
+}
+
+void UInteractionComponent::FireTargetEventsIfNecessary(AActor* PreviousTarget)
+{
+	if (PreviousTarget == TargetedActor) return;
+
+	if (!PreviousTarget && TargetedActor)
+	{
+		OnInteractiveActorStartTarget.Broadcast(TargetedActor);
+	}
+	else if (PreviousTarget && !TargetedActor)
+	{
+		OnInteractiveActorEndTarget.Broadcast(PreviousTarget);
+	}
 }

@@ -58,8 +58,8 @@ void AParkBench::Interact_Implementation(AActor* Source)
 
 FText AParkBench::GetInteractionPrompt_Implementation()
 {
-	if (bCanPlayerSit) return FText::FromString(TEXT("Sit Down & Rest"));
-	else return FText::FromString(TEXT("You don't feel like resting..."));
+	if (bCanPlayerSit) return NSLOCTEXT("", "SitDownAction", "Sit Down & Rest");
+	else return NSLOCTEXT("", "SitDownActionDenied", "You don't feel like resting right now");
 }
 
 bool AParkBench::IsInteractive_Implementation()
