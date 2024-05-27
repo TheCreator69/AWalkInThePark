@@ -123,7 +123,8 @@ void USplineMovementComponent::PlayAppropriateCameraShake()
 	{
 		ChosenCameraShake = IdleCameraShake;
 	}
-	
+
+	if (!ChosenCameraShake) return;
 	if (ChosenCameraShake->IsChildOf<UCameraShakeBase>())
 	{
 		UGameplayStatics::PlayWorldCameraShake(GetWorld(), ChosenCameraShake, Owner->GetActorLocation(), 0.f, 100.f);
