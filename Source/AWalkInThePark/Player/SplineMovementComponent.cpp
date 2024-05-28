@@ -61,6 +61,9 @@ void USplineMovementComponent::SetOwnerTransformAlongSpline() const
 			RotationOffsetInterpSpeed
 		);
 
+		// Fix so spawning shadow monster doesn't crash the game (Controller doesn't exist immediately after spawning)
+		if (!Owner->GetController()) return;
+
 		Owner->GetController()->SetControlRotation(InterpCameraRotationOffset);
 	}
 }

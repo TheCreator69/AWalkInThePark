@@ -41,6 +41,7 @@ void UMusicAudioComponent::ChangeMusicTrack(int NewIndex)
 
 	SetSound(MusicTracks[NewIndex]);
 	MusicIndex = NewIndex;
+	PlaybackTime = 0.0;
 }
 
 void UMusicAudioComponent::StartMusic()
