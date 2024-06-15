@@ -117,6 +117,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Stalking")
 	void ReactivateMonster();
 
+	// Prevent the monster from being reactivated. Doesn't deactivate the monster
+	UFUNCTION(BlueprintCallable, Category = "Stalking")
+	void DisableReactivation();
+
 public:
 	// Get the monster's current aggression
 	UFUNCTION(BlueprintCallable, Category = "Aggression")

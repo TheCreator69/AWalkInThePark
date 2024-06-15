@@ -64,6 +64,11 @@ void AWalkMonster::ReactivateMonster()
 	UE_LOGFMT(LogMonster, Display, "Reactivated monster");
 }
 
+void AWalkMonster::DisableReactivation()
+{
+	bCanBeReactivated = false;
+}
+
 void AWalkMonster::DeactivateMonster()
 {
 	GetWorld()->GetTimerManager().ClearTimer(AggressionChangeTimerHandle);
