@@ -91,7 +91,19 @@ void AWalkPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AWalkPawn::KillPlayer(TEnumAsByte<EPlayerDeathReason> Reason)
 {
+	if (IsPlayerDead) return;
+
+	IsPlayerDead = true;
+	K2_OnPlayerDeath(Reason.GetValue());
+
 	UE_LOGFMT(LogWalkPlayer, Verbose, "Player is dead with reason: {0}", Reason.GetValue());
+}
+
+void AWalkPawn::RespawnPlayer()
+{
+	IsPlayerDead = false;
+
+	UE_LOGFMT(LogWalkPlayer, Verbose, "Player was respawned!");
 }
 
 void AWalkPawn::ChangeSpeed(const FInputActionValue& Value)

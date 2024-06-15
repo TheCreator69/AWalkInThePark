@@ -123,6 +123,9 @@ public:
 	// Event dispatched when player stops overlapping a safe zone
 	UPROPERTY(BlueprintAssignable, Category = "Safe Zone")
 	FEndOverlapSafeZone OnEndOverlapSafeZone;
+	
+	// Used so death event doesn't fire many times
+	bool IsPlayerDead = false;
 
 protected:
 	// Called when the game starts or when spawned
@@ -138,6 +141,14 @@ public:
 	// Kill the player!!! And also specify a reason
 	UFUNCTION()
 	void KillPlayer(TEnumAsByte<EPlayerDeathReason> Reason);
+
+	// Event that gets called when the player has died
+	UFUNCTION(BlueprintImplementableEvent, Category = "Death", meta = (DisplayName = "OnPlayerDeath"))
+	void K2_OnPlayerDeath(EPlayerDeathReason Reason);
+
+	// Respawns player at last park bench or at the start of the path
+	UFUNCTION(BlueprintCallable, Category = "Death")
+	void RespawnPlayer();
 
 private:
 	// Accelerate/decelerate the pawn along a spline
