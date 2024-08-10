@@ -9,6 +9,7 @@
 // Header file for global utility functions and defines (such as log categories)
 
 DECLARE_LOG_CATEGORY_EXTERN(LogWalkPlayer, Log, All);
+DECLARE_LOG_CATEGORY_EXTERN(LogWalkGameMode, Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogSplineMovement, Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogSanity, Log, All);
 DECLARE_LOG_CATEGORY_EXTERN(LogInteraction, Log, All);

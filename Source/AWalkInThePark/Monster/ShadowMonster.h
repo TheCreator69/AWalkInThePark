@@ -64,6 +64,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AccelerateToSpeed(float TargetSpeed, float Duration);
 
+	// Stop the shadow monster dead in its tracks. Actually, if that happens, the player is dead.
+	UFUNCTION()
+	void StopShadow();
+
 private:
 	UFUNCTION()
 	void OnLightDisablerOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

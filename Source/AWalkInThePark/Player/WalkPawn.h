@@ -20,6 +20,7 @@ class UMusicAudioComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FStartOverlapSafeZone);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FEndOverlapSafeZone);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FPlayerDied);
 
 UENUM(BlueprintType)
 enum EPlayerDeathReason
@@ -123,6 +124,10 @@ public:
 	// Event dispatched when player stops overlapping a safe zone
 	UPROPERTY(BlueprintAssignable, Category = "Safe Zone")
 	FEndOverlapSafeZone OnEndOverlapSafeZone;
+	
+	// Event dispatched when player died
+	UPROPERTY(BlueprintAssignable, Category = "Death")
+	FPlayerDied OnPlayerDied;
 	
 	// Used so death event doesn't fire many times
 	bool IsPlayerDead = false;

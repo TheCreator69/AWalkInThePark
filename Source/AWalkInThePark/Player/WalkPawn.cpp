@@ -18,6 +18,7 @@
 #include "SittingComponent.h"
 #include "WalkCameraActor.h"
 #include "MusicAudioComponent.h"
+#include "../Core/WalkGameModeBase.h"
 
 // Sets default values
 AWalkPawn::AWalkPawn()
@@ -93,6 +94,31 @@ void AWalkPawn::KillPlayer(TEnumAsByte<EPlayerDeathReason> Reason)
 {
 	if (IsPlayerDead) return;
 
+	/*
+	- Stop movement
+	- Disable movement
+	- Stop music
+	- Freeze and restore sanity
+	- Stop all monster activity
+	*/
+
+	SplineMovementComponent->StopMovement();
+
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
+	Subsystem->RemoveMappingContext(GlobalMappingContext);
+
+	if (MusicPlayerComponent->IsPlaying())
+	{
+		MusicPlayerComponent->ToggleMusic();
+	}
+
+	SanityComponent->SetDecreaseSanity(false);
+	SanityComponent->SetSanity(1.f);
+
+	// Let monsters know that player died so they can deactivate themselves
+	OnPlayerDied.Broadcast();
+
 	IsPlayerDead = true;
 	K2_OnPlayerDeath(Reason.GetValue());
 
@@ -101,6 +127,17 @@ void AWalkPawn::KillPlayer(TEnumAsByte<EPlayerDeathReason> Reason)
 
 void AWalkPawn::RespawnPlayer()
 {
+	/*
+	- Enable movement
+	- Tell GameMode to respawn player and reset progress
+	*/
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
+	Subsystem->AddMappingContext(GlobalMappingContext, 0);
+
+	AWalkGameModeBase* GameMode = Cast<AWalkGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	GameMode->ReloadLevelAndRespawnPlayer();
+
 	IsPlayerDead = false;
 
 	UE_LOGFMT(LogWalkPlayer, Verbose, "Player was respawned!");

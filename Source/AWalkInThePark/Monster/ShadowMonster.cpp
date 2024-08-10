@@ -35,6 +35,11 @@ void AShadowMonster::BeginPlay()
 	Super::BeginPlay();
 
 	LightDisabler->OnComponentBeginOverlap.AddUniqueDynamic(this, &AShadowMonster::OnLightDisablerOverlap);
+
+	AWalkPawn* Player = Cast<AWalkPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	if (!Player) return;
+
+	Player->OnPlayerDied.AddUniqueDynamic(this, &AShadowMonster::StopShadow);
 }
 
 void AShadowMonster::Tick(float DeltaTime)
@@ -66,9 +71,14 @@ void AShadowMonster::AccelerateToSpeed(float TargetSpeed, float Duration)
 	TimeNeededToAccelerate = Duration;
 }
 
+void AShadowMonster::StopShadow()
+{
+	SplineMovementComponent->StopMovement();
+}
+
 void AShadowMonster::OnLightDisablerOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	AWalkPawn* PlayerPawn = Cast<AWalkPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+	AWalkPawn* PlayerPawn = Cast<AWalkPawn>(OtherActor);
 	if (!PlayerPawn) return;
 
 	PlayerPawn->KillPlayer(TEnumAsByte<EPlayerDeathReason>(ShadowMonster));

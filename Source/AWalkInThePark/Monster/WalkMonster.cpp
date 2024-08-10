@@ -39,6 +39,7 @@ void AWalkMonster::BeginPlay()
 
 	Player->OnBeginOverlapSafeZone.AddUniqueDynamic(this, &AWalkMonster::DeactivateMonster);
 	Player->OnEndOverlapSafeZone.AddUniqueDynamic(this, &AWalkMonster::ReactivateMonster);
+	Player->OnPlayerDied.AddUniqueDynamic(this, &AWalkMonster::DeactivateMonster);
 }
 
 void AWalkMonster::EndPlay(const EEndPlayReason::Type EndPlayReason)
