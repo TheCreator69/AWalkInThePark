@@ -141,6 +141,8 @@ void AWalkPawn::RespawnPlayer()
 
 	IsPlayerDead = false;
 
+	OnPlayerRespawned.Broadcast();
+
 	UE_LOGFMT(LogWalkPlayer, Verbose, "Player was respawned!");
 }
 
