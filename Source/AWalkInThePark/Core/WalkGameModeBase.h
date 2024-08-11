@@ -6,6 +6,10 @@
 #include "GameFramework/GameModeBase.h"
 #include "WalkGameModeBase.generated.h"
 
+class AWalkMonster;
+class AShadowMonster;
+class AParkBench;
+
 // The current game's progress. Used for respawning logic
 UENUM(BlueprintType)
 enum EGameProgress
@@ -31,6 +35,24 @@ public:
 	// Progress the game further (or backwards, if you're crazy like that)
 	UFUNCTION(BlueprintCallable, Category = "Progress")
 	void SetGameProgress(TEnumAsByte<EGameProgress> Progress);
+
+	// First park bench player sits on
+	TObjectPtr<AParkBench> FirstParkBench;
+
+	// Second park bench player sits on
+	TObjectPtr<AParkBench> SecondParkBench;
+
+	// Third park bench player sits on
+	TObjectPtr<AParkBench> ThirdParkBench;
+
+	// Water Monster Reference
+	TObjectPtr<AWalkMonster> WaterMonster;
+
+	// Park Monster Reference
+	TObjectPtr<AWalkMonster> ParkMonster;
+
+	// Shadow Monster Reference
+	TObjectPtr<AShadowMonster> ShadowMonster;
 
 private:
 	TEnumAsByte<EGameProgress> CurrentProgress = Start;

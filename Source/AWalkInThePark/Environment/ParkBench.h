@@ -50,6 +50,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sitting")
 	FRotator SitDownStartRotation = FRotator(0);
 
+	// A higher ID means the player encounters this park bench later. Make sure no two park benches in a level have the same ID.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Respawn")
+	int ParkBenchID = 0;
+
 private:
 	// Whether the player can sit on this bench or not.
 	// Will be false if the player has sat down on this bench or is currently sitting.

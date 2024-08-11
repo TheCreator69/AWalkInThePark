@@ -7,6 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "../Player/WalkPawn.h"
 #include "Kismet/GameplayStatics.h"
+#include "../Core/WalkGameModeBase.h"
 
 // Sets default values
 AShadowMonster::AShadowMonster()
@@ -40,6 +41,9 @@ void AShadowMonster::BeginPlay()
 	if (!Player) return;
 
 	Player->OnPlayerDied.AddUniqueDynamic(this, &AShadowMonster::StopShadow);
+
+	AWalkGameModeBase* GameMode = Cast<AWalkGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	GameMode->ShadowMonster = this;
 }
 
 void AShadowMonster::Tick(float DeltaTime)
@@ -74,6 +78,11 @@ void AShadowMonster::AccelerateToSpeed(float TargetSpeed, float Duration)
 void AShadowMonster::StopShadow()
 {
 	SplineMovementComponent->StopMovement();
+}
+
+void AShadowMonster::ResetShadowOnRespawn()
+{
+	SplineMovementComponent->ResetPathProgress();
 }
 
 void AShadowMonster::OnLightDisablerOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

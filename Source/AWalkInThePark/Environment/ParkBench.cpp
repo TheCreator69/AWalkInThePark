@@ -5,6 +5,7 @@
 #include "../Player/WalkPawn.h"
 #include "Camera/CameraComponent.h"
 #include "../Core/WalkDefines.h"
+#include "../Core/WalkGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "../Player/SittingComponent.h"
 #include "Components/ArrowComponent.h"
@@ -35,6 +36,22 @@ void AParkBench::BeginPlay()
 	Super::BeginPlay();
 
 	Player = Cast<AWalkPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0));
+
+	AWalkGameModeBase* GameMode = Cast<AWalkGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	switch (ParkBenchID)
+	{
+	case 1:
+		GameMode->FirstParkBench = this;
+		break;
+	case 2:
+		GameMode->SecondParkBench = this;
+		break;
+	case 3:
+		GameMode->ThirdParkBench = this;
+		break;
+	default:
+		UE_LOGFMT(LogBench, Warning, "Invalid park bench ID (valid range: 1-3)");
+	}
 }
 
 void AParkBench::AllowPlayerToGetUp()

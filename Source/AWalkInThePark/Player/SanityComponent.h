@@ -108,17 +108,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Sanity")
 	void SetDecreaseSanity(bool bNewDecreaseSanity);
 
-private:
-	float Sanity = 1.f;
-
-	// Should sanity currently be decreased? Has no effect is bCanDecreaseSanity is set to false
-	bool bDecreaseSanity = true;
-
-	// Can sanity currently be decreased? False if player is in safe zone, for instance.
-	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
-	bool bCanDecreaseSanity = false;
-
-protected:
 	// Set sanity right above the threshold where sanity effects kick in
 	UFUNCTION(BlueprintCallable)
 	void TriggerEffectsImmediately();
@@ -132,6 +121,15 @@ protected:
 	void ProhibitDecreasingSanityAndReset();
 
 private:
+	float Sanity = 1.f;
+
+	// Should sanity currently be decreased? Has no effect is bCanDecreaseSanity is set to false
+	bool bDecreaseSanity = true;
+
+	// Can sanity currently be decreased? False if player is in safe zone, for instance.
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	bool bCanDecreaseSanity = false;
+
 	// Increase/decrease sanity. Used in tick function
 	void UpdateSanity(float DeltaTime);
 

@@ -82,6 +82,9 @@ public:
 	// Change input and other gameplay elements when the player stands up
 	void OnPlayerGetUp();
 
+	// Immediately sit down without playing an animation and allow the player to get up immediately
+	void SitDownForRespawn(AParkBench* TargetBench);
+
 	// Whether the player is current sitting
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Sitting")
 	bool IsPlayerSitting() const;

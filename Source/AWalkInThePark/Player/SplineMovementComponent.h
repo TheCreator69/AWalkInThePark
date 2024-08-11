@@ -127,6 +127,9 @@ public:
 	*/
 	void ChangePath(AWalkPath* NewPath);
 
+	// Reset the owner's progress on a path
+	void ResetPathProgress();
+
 	/*
 	* Add the specified amount to the current movement speed.
 	* The amount is added in 1 second, so if the function is only called for 0.1 seconds, only 10% of the full amount is added.

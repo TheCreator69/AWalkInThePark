@@ -10,6 +10,7 @@
 #include "PlayerFollowComponent.h"
 #include "MonsterFootstepAudioComponent.h"
 #include "../Core/WalkDefines.h"
+#include "../Core/WalkGameModeBase.h"
 
 // Sets default values
 AWalkMonster::AWalkMonster()
@@ -40,6 +41,10 @@ void AWalkMonster::BeginPlay()
 	Player->OnBeginOverlapSafeZone.AddUniqueDynamic(this, &AWalkMonster::DeactivateMonster);
 	Player->OnEndOverlapSafeZone.AddUniqueDynamic(this, &AWalkMonster::ReactivateMonster);
 	Player->OnPlayerDied.AddUniqueDynamic(this, &AWalkMonster::DeactivateMonster);
+
+	AWalkGameModeBase* GameMode = Cast<AWalkGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
+	if(bIsWaterMonster) GameMode->WaterMonster = this;
+	else GameMode->ParkMonster = this;
 }
 
 void AWalkMonster::EndPlay(const EEndPlayReason::Type EndPlayReason)

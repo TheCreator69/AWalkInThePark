@@ -180,6 +180,11 @@ void USplineMovementComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 void USplineMovementComponent::ChangePath(AWalkPath* NewPath)
 {
 	CurrentPath = NewPath;
+	ResetPathProgress();
+}
+
+void USplineMovementComponent::ResetPathProgress()
+{
 	DistanceAlongSpline = 0.f;
 }
 

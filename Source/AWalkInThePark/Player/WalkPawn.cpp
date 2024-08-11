@@ -96,6 +96,7 @@ void AWalkPawn::KillPlayer(TEnumAsByte<EPlayerDeathReason> Reason)
 
 	/*
 	- Stop movement
+	- Reset movement on current spline
 	- Disable movement
 	- Stop music
 	- Freeze and restore sanity
@@ -103,18 +104,19 @@ void AWalkPawn::KillPlayer(TEnumAsByte<EPlayerDeathReason> Reason)
 	*/
 
 	SplineMovementComponent->StopMovement();
+	SplineMovementComponent->ResetPathProgress();
 
 	APlayerController* PC = Cast<APlayerController>(GetController());
-	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
-	Subsystem->RemoveMappingContext(GlobalMappingContext);
+	// Somehow, the method on the player controller doesn't work, but the one on the pawn does??? Unreal can be strange.
+	DisableInput(PC);
+	UE_LOGFMT(LogWalkPlayer, Warning, "Player input should be disabled.");
 
 	if (MusicPlayerComponent->IsPlaying())
 	{
 		MusicPlayerComponent->ToggleMusic();
 	}
 
-	SanityComponent->SetDecreaseSanity(false);
-	SanityComponent->SetSanity(1.f);
+	SanityComponent->ProhibitDecreasingSanityAndReset();
 
 	// Let monsters know that player died so they can deactivate themselves
 	OnPlayerDied.Broadcast();
@@ -132,8 +134,7 @@ void AWalkPawn::RespawnPlayer()
 	- Tell GameMode to respawn player and reset progress
 	*/
 	APlayerController* PC = Cast<APlayerController>(GetController());
-	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
-	Subsystem->AddMappingContext(GlobalMappingContext, 0);
+	EnableInput(PC);
 
 	AWalkGameModeBase* GameMode = Cast<AWalkGameModeBase>(UGameplayStatics::GetGameMode(GetWorld()));
 	GameMode->ReloadLevelAndRespawnPlayer();

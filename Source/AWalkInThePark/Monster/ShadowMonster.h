@@ -68,6 +68,9 @@ public:
 	UFUNCTION()
 	void StopShadow();
 
+	// Set shadow bcak to beginning of its path when the player respawns
+	void ResetShadowOnRespawn();
+
 private:
 	UFUNCTION()
 	void OnLightDisablerOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

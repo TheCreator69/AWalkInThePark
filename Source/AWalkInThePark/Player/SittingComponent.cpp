@@ -91,6 +91,33 @@ void USittingComponent::OnPlayerGetUp()
 	UE_LOGFMT(LogSitting, Display, "Player got up");
 }
 
+void USittingComponent::SitDownForRespawn(AParkBench* TargetBench)
+{
+	// I just copied code from OnPlayerSitDown() and AllowPlayerToGetUp()...
+
+	Player->SplineMovementComponent->StopMovement();
+	// To prevent component from immediately resetting player's location and control rotation.
+	// Ugly hack, but that way I can use the camera rotation code without having to rewrite it for when the player is sitting.
+	Player->SplineMovementComponent->bSitMode = true;
+	// Offset value ... fresh from my ass.
+	Player->SplineMovementComponent->SitModeLocation = TargetBench->CameraComponent->GetComponentLocation() + FVector(0, 0, -40);
+	Player->SplineMovementComponent->SitModeBaseOffset = TargetBench->CameraComponent->GetComponentRotation();
+
+	Player->CameraComponent->SetRelativeLocation(CameraRelativeSitLocation);
+
+	CurrentBench = TargetBench;
+
+	RemoveMappingContext(WalkingMappingContext);
+
+	SitStatus = Sitting;
+
+	AddMappingContext(SittingMappingContext);
+
+	UGameplayStatics::GetPlayerController(this, 0)->SetViewTargetWithBlend(Player, 0);
+
+	UE_LOGFMT(LogSitting, Display, "Player finished sitting down");
+}
+
 bool USittingComponent::IsPlayerSitting() const
 {
 	return SitStatus != Standing;
