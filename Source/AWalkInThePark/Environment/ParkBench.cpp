@@ -84,3 +84,10 @@ bool AParkBench::IsInteractive_Implementation()
 	return bCanPlayerSit;
 }
 
+void AParkBench::ReactivateParkBench()
+{
+	bCanPlayerSit = true;
+
+	UE_LOGFMT(LogBench, Display, "Park bench #{0} reactivated", ParkBenchID);
+}
+

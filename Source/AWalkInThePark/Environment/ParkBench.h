@@ -86,5 +86,9 @@ public:
 
 	// C++ implementation of IsInteractive() from IInteractiveActor
 	bool IsInteractive_Implementation();
+	
+	// Allow park bench to be sat on once again
+	UFUNCTION(BlueprintCallable, Category = "Sitting")
+	void ReactivateParkBench();
 
 };

@@ -37,12 +37,15 @@ public:
 	void SetGameProgress(TEnumAsByte<EGameProgress> Progress);
 
 	// First park bench player sits on
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Respawning")
 	TObjectPtr<AParkBench> FirstParkBench;
 
 	// Second park bench player sits on
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Respawning")
 	TObjectPtr<AParkBench> SecondParkBench;
 
 	// Third park bench player sits on
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Respawning")
 	TObjectPtr<AParkBench> ThirdParkBench;
 
 	// Water Monster Reference
