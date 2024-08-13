@@ -108,14 +108,14 @@ void AWalkMonster::ChangeAggressionPeriodically()
 {
 	if (IsPlayerStaringDownMonster())
 	{
-		FAggressionChangeInfo* Info = &AggressionIncreaseInfo;
+		FAggressionChangeInfo* Info = &AggressionDecreaseInfo;
 		double AggressionChange = CalculateAggressionChange(true, Info->BaseChange, Info->OffsetMin, Info->OffsetMax);
 		SetAggression(Aggression - AggressionChange);
 		UE_LOGFMT(LogMonster, Verbose, "Player is staring down monster: {0}", GetName());
 	}
 	else
 	{
-		FAggressionChangeInfo* Info = &AggressionDecreaseInfo;
+		FAggressionChangeInfo* Info = &AggressionIncreaseInfo;
 		double AggressionChange = CalculateAggressionChange(false, Info->BaseChange, Info->OffsetMin, Info->OffsetMax);
 		SetAggression(Aggression + AggressionChange);
 		UE_LOGFMT(LogMonster, Verbose, "Player is NOT staring down monster: {0}", GetName());

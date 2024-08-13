@@ -164,21 +164,23 @@ void USittingComponent::FinishGetUp(UAnimMontage* Montage, bool bInterrupted)
 void USittingComponent::AddMappingContext(UInputMappingContext* MappingContext) const
 {
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = GetEnhancedInputSubsystem();
+	if (!Subsystem) return;
 	Subsystem->AddMappingContext(MappingContext, 1);
 }
 
 void USittingComponent::RemoveMappingContext(UInputMappingContext* MappingContext) const
 {
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = GetEnhancedInputSubsystem();
+	if (!Subsystem) return;
 	Subsystem->RemoveMappingContext(MappingContext);
 }
 
 UEnhancedInputLocalPlayerSubsystem* USittingComponent::GetEnhancedInputSubsystem() const
 {
 	APlayerController* PC = Cast<APlayerController>(Player->GetController());
-	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
+	if (!PC) return NULL;
 
-	return Subsystem;
+	return ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
 }
 
 void USittingComponent::PlayAnimMontage(UAnimMontage* Montage) const

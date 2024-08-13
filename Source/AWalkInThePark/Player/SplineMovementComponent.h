@@ -128,6 +128,7 @@ public:
 	void ChangePath(AWalkPath* NewPath);
 
 	// Reset the owner's progress on a path
+	UFUNCTION(BlueprintCallable, Category = "Movement")
 	void ResetPathProgress();
 
 	/*
@@ -138,6 +139,7 @@ public:
 	void AddToMovementSpeed(float SpeedOffsetPerSecond);
 
 	// Reset movement speed, stopping owner
+	UFUNCTION(BlueprintCallable, Category = "Movement")
 	void StopMovement();
 
 	// Add a rotation offset to the player's camera. The yaw and pitch are capped based on the values provided to this component
