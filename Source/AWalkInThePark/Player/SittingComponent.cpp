@@ -7,6 +7,7 @@
 #include "../Environment/ParkBench.h"
 #include "Kismet/GameplayStatics.h"
 #include "SplineMovementComponent.h"
+#include "MusicAudioComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
 #include "Animation/AnimInstance.h"
@@ -40,6 +41,11 @@ void USittingComponent::OnPlayerSitDown(AParkBench* TargetBench)
 	// Offset value ... fresh from my ass.
 	Player->SplineMovementComponent->SitModeLocation = TargetBench->CameraComponent->GetComponentLocation() + FVector(0, 0, -40);
 	Player->SplineMovementComponent->SitModeBaseOffset = TargetBench->CameraComponent->GetComponentRotation();
+
+	if (Player->MusicPlayerComponent->IsPlaying())
+	{
+		Player->MusicPlayerComponent->ToggleMusic();
+	}
 
 	Player->CameraComponent->SetRelativeLocation(CameraRelativeSitLocation);
 

@@ -75,13 +75,14 @@ void USplineMovementComponent::SetOwnerMeshRotation() const
 
 	if (bSitMode)
 	{
+		// This needs to the world rotation because otherwise player's mesh would rotate with the camera
 		Owner->MeshComponent->SetWorldRotation(SitModeBaseOffset + FRotator(0, -90, 0));
 	}
 	else
 	{
 		FTransform SplineTransform = CurrentPath->Spline->GetTransformAtDistanceAlongSpline(DistanceAlongSpline, ESplineCoordinateSpace::World);
 		// A bit of a hack since rotating the skeletal mesh and animations would require more time and expertise from the developer.
-		FRotator MeshRotation = SplineTransform.GetRotation().Rotator() + StandingMeshBaseOffset;
+		FQuat MeshRotation = SplineTransform.GetRotation() + StandingMeshBaseOffset.Quaternion();
 		Owner->MeshComponent->SetWorldRotation(MeshRotation);
 	}
 }

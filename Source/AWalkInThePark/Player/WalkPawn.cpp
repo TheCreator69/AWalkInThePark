@@ -95,7 +95,6 @@ void AWalkPawn::KillPlayer(TEnumAsByte<EPlayerDeathReason> Reason)
 
 	/*
 	- Stop movement
-	- Reset movement on current spline
 	- Disable movement
 	- Stop music
 	- Freeze and restore sanity
@@ -103,7 +102,6 @@ void AWalkPawn::KillPlayer(TEnumAsByte<EPlayerDeathReason> Reason)
 	*/
 
 	SplineMovementComponent->StopMovement();
-	SplineMovementComponent->ResetPathProgress();
 
 	APlayerController* PC = Cast<APlayerController>(GetController());
 	// Somehow, the method on the player controller doesn't work, but the one on the pawn does??? Unreal can be strange.
