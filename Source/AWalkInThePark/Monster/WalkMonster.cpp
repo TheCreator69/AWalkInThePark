@@ -101,7 +101,7 @@ void AWalkMonster::SetAggression(double NewAggression)
 
 		PlayerPawn->KillPlayer(DeathReason);
 	}
-	UE_LOGFMT(LogMonster, Verbose, "Aggression set: {0}", Aggression);
+	UE_LOGFMT(LogMonster, Display, "Aggression set: {0}", Aggression);
 }
 
 void AWalkMonster::ChangeAggressionPeriodically()
